@@ -3,9 +3,9 @@ import { NgModule } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http'; 
 
 import { AppComponent } from './app.component';
-import { UserListComponent } from './user-list/user-list.component';  
-import { UserInfoComponent } from './user-info/user-info.component';
-import { ExchangeRateAnalyticsComponent } from './exchange-rate-analytics/exchange-rate-analytics.component';
+import { UserListComponent } from './components/user-list/user-list.component';  
+import { UserInfoComponent } from './components/user-info/user-info.component';
+import { ExchangeRateAnalyticsComponent } from './components/exchange-rate-analytics/exchange-rate-analytics.component';
 import { RouterModule } from '@angular/router';
 import { routes } from './app.routes'; 
 

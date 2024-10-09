@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../services/user.service';
-import { ExchangeRate } from '../model/exchangeRate';
+import { UserService } from '../../services/user.service';
+import { ExchangeRate } from '../../model/exchangeRate';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -60,7 +60,7 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
     } else if (value > median) {
       return '#24a349';
     } else {
-      return 'black';
+      return 'blue';
     }
   }
 

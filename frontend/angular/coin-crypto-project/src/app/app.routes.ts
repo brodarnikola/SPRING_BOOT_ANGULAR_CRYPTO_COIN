@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { UserInfoComponent } from './user-info/user-info.component';
-import { UserListComponent } from './user-list/user-list.component';
+import { UserInfoComponent } from './components/user-info/user-info.component';
+import { UserListComponent } from './components/user-list/user-list.component';
 
 export const routes: Routes = [
     {path: '', component: UserListComponent},

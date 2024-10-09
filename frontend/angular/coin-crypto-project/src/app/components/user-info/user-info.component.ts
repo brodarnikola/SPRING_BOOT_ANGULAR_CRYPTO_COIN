@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router'; 
-import { UserService } from '../services/user.service';
-import { User } from '../model/user';
-import { Wallet } from '../model/wallet'; // Assuming you have a Wallet model
+import { UserService } from '../../services/user.service';
+import { User } from '../../model/user';
+import { Wallet } from '../../model/wallet'; // Assuming you have a Wallet model
 import { CommonModule } from '@angular/common';
-import { WalletDetailsResponse } from '../model/walletDetailsResponse';
+import { WalletDetailsResponse } from '../../model/walletDetailsResponse';
 
 @Component({
   selector: 'app-user-info', 

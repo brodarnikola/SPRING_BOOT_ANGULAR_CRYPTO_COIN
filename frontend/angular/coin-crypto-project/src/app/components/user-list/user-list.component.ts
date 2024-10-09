@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../services/user.service';
+import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { User } from '../model/user';
+import { User } from '../../model/user';
 import { CommonModule } from '@angular/common';
 import { ExchangeRateAnalyticsComponent } from '../exchange-rate-analytics/exchange-rate-analytics.component';
 
