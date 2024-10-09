@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { ExchangeRate } from '../../model/exchangeRate';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms'; 
+import { ColorUtils } from '../../util/color-utils';
 
 @Component({
   selector: 'app-exchange-rate-analytics',
@@ -55,13 +56,7 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
   }
 
   getColor(value: number, median: number): string {
-    if (value < median) {
-      return 'red';
-    } else if (value > median) {
-      return '#24a349';
-    } else {
-      return 'blue';
-    }
+    return ColorUtils.getColor(value, median);
   }
 
   onDateChange(): void {

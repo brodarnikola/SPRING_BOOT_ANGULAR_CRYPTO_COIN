@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/coin")
 public class TestCoinController {
 
-//    @Autowired
     private final TUserRepository tUserRepository;
     private final TWalletRepository tWalletRepository;
     private final TExchangeRateRepository tExchangeRateRepository;
@@ -60,11 +59,6 @@ public class TestCoinController {
         WalletDetailsResponse response = new WalletDetailsResponse(wallets, totalWorth, lastPurchase.orElse(null));
 
         return ResponseEntity.ok(response);
-    }
-
-    private double getWalletWorth(TWallet wallet) {
-        // Implement logic to calculate the worth of the wallet
-        return 0.0; // Placeholder
     }
 
     @GetMapping("/exchange-rates")

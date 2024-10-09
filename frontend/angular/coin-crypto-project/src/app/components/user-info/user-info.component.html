@@ -14,16 +14,18 @@
     <table *ngIf="wallets.length > 0">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>User id</th>
+          <th>#</th>
+          <th>ID</th> 
           <th>Coin token</th>
+          <th>Count TimeStamp</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let wallet of wallets">
-          <td>{{ wallet.id }}</td>
-          <td>{{ wallet.idUser }}</td>
+        <tr *ngFor="let wallet of wallets; let i = index"> 
+          <td>{{ i + 1 }}</td>
+          <td>{{ wallet.id }}</td> 
           <td>{{ wallet.coinToken }}</td>
+          <td>{{ wallet.countTimeStamp | date: 'short' }}</td>
         </tr>
       </tbody>
     </table>

@@ -8,11 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class TestCoinService {
@@ -26,13 +23,12 @@ public class TestCoinService {
         user.setAddress(faker.address().fullAddress());
         user.setPostal(faker.address().zipCode());
         user.setCity(faker.address().city());
-        user.setCoinValue(0); // Can be computed from wallet later
+        user.setCoinValue(0);
         return user;
     }
 
     public Set<TWallet> getWallet(int idUser) {
         Set<TWallet> wallets = new HashSet<>();
-//        for (int i = 0; i < 500; i++) {
         for (int i = 0; i < 500; i++) {
             TWallet wallet = new TWallet();
             wallet.setIdUser(idUser);

@@ -41,7 +41,7 @@ export class UserInfoComponent implements OnInit {
   fetchWallets(userId: number): void {
     this.userService.getWallets(userId).subscribe(
       (data: Wallet[]) => {
-        console.log('Fetched wallet data:', data);
+        console.log('Fetched wallet data:', data); 
         this.wallets = data;
       },
       (error) => console.error('Error fetching wallet data', error)
@@ -52,7 +52,7 @@ export class UserInfoComponent implements OnInit {
     this.userService.getWalletDetails(userId).subscribe(
       (data: WalletDetailsResponse) => {
         console.log('Fetched wallet details:', data);
-        this.wallets = data.wallets;
+        this.wallets = data.wallets.sort((a, b) => new Date(b.countTimeStamp).getTime() - new Date(a.countTimeStamp).getTime());
         this.totalWorth = data.totalWorth;
         this.lastPurchase = data.lastPurchase;
       },
