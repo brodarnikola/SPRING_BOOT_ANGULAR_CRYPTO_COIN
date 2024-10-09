@@ -23,3 +23,16 @@ table {
   input[type="date"] {
     margin: 0 10px;
   }
+
+  .filters {
+    margin-bottom: 20px;
+  }
+  
+  .filters label {
+    margin-right: 10px;
+  }
+  
+  .filter-input {
+    margin-right: 20px;
+    margin-bottom: 10px;
+  }

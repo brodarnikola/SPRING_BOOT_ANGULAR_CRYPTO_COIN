@@ -14,12 +14,18 @@ import { ColorUtils } from '../../util/color-utils';
 })
 export class ExchangeRateAnalyticsComponent implements OnInit {
   exchangeRates: ExchangeRate[] = [];
+  filteredExchangeRates: ExchangeRate[] = [];
   eurMedian: number = 0;
   usdMedian: number = 0;
   gbpMedian: number = 0;
   dateFrom: string = '';
-  dateTo: string = '';
-
+  dateTo: string = ''; 
+  
+  // Filter values
+  eurFilter: string = '';
+  usdFilter: string = '';
+  gbpFilter: string = '';
+ 
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
@@ -34,6 +40,7 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
     this.userService.getExchangeRates(this.dateFrom, this.dateTo).subscribe(
       (data: ExchangeRate[]) => {
         this.exchangeRates = data;
+        this.filteredExchangeRates = data;
         this.calculateMedians();
       },
       (error) => console.error('Error fetching exchange rates', error)
@@ -62,4 +69,13 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
   onDateChange(): void {
     this.fetchExchangeRates();
   }
+
+  filterExchangeRates(): void {
+    this.filteredExchangeRates = this.exchangeRates.filter(rate => 
+      (!this.eurFilter || rate.excRateEur.toString().includes(this.eurFilter)) &&
+      (!this.usdFilter || rate.excRateUsd.toString().includes(this.usdFilter)) &&
+      (!this.gbpFilter || rate.excRateGbp.toString().includes(this.gbpFilter))
+    );
+  }
+
 }

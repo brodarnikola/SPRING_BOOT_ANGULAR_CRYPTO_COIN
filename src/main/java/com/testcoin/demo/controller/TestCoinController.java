@@ -6,7 +6,10 @@ import com.testcoin.demo.model.TWallet;
 import com.testcoin.demo.model.response.WalletDetailsResponse;
 import com.testcoin.demo.repository.TExchangeRateRepository;
 import com.testcoin.demo.repository.TUserRepository;
-import com.testcoin.demo.repository.TWalletRepository; 
+import com.testcoin.demo.repository.TWalletRepository;
+import com.testcoin.demo.service.ExchangeRateService;
+import com.testcoin.demo.service.WalletService;
+ 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,15 +21,23 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/coin")
 public class TestCoinController {
 
+
     private final TUserRepository tUserRepository;
     private final TWalletRepository tWalletRepository;
     private final TExchangeRateRepository tExchangeRateRepository;
+    private WalletService walletService;
+    private ExchangeRateService exchangeRateService;
 
     public TestCoinController(  TUserRepository tUserRepositoryParam,
-                              TWalletRepository tWalletRepositoryParam, TExchangeRateRepository tExchangeRateRepositoryParam) {
+                              TWalletRepository tWalletRepositoryParam, 
+                              TExchangeRateRepository tExchangeRateRepositoryParam,
+                              WalletService walletServiceParam,
+                              ExchangeRateService exchangeRateServiceParam) {
         tUserRepository = tUserRepositoryParam;
         tWalletRepository = tWalletRepositoryParam;
         tExchangeRateRepository = tExchangeRateRepositoryParam;
+        walletService = walletServiceParam;
+        exchangeRateService = exchangeRateServiceParam;
     }
 
     @GetMapping("/users")
@@ -42,6 +53,12 @@ public class TestCoinController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/exchange-rates")
+    public ResponseEntity<Set<TExchangeRate>> getExchangeRates(@RequestParam String dateFrom, @RequestParam String dateTo) {
+        Set<TExchangeRate> exchangeRates = exchangeRateService.getExchangeRates(dateFrom, dateTo);
+        return ResponseEntity.ok(exchangeRates);
+    }
+
     @GetMapping("/wallets")
     public ResponseEntity<Set<TWallet>> getWallet(@RequestParam int idUser) { 
         Set<TWallet> wallets = new HashSet<>(tWalletRepository.findByIdUser(idUser)); // Fetch from DB
@@ -50,24 +67,7 @@ public class TestCoinController {
 
     @GetMapping("/wallets/details")
     public ResponseEntity<WalletDetailsResponse> getWalletDetails(@RequestParam int idUser) {
-        Set<TWallet> wallets = new HashSet<>(tWalletRepository.findByIdUser(idUser));
-        Optional<TWallet> lastPurchase = wallets.stream()
-                .max(Comparator.comparing(TWallet::getCountTimeStamp));
-
-        double totalWorth = wallets.size(); // Each token is worth 1
-
-        WalletDetailsResponse response = new WalletDetailsResponse(wallets, totalWorth, lastPurchase.orElse(null));
-
+        WalletDetailsResponse response = walletService.getWalletDetails(idUser);
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/exchange-rates")
-    public ResponseEntity<Set<TExchangeRate>> getExchangeRates(@RequestParam String dateFrom, @RequestParam String dateTo) { 
-        LocalDate from = LocalDate.parse(dateFrom);
-        LocalDate to = LocalDate.parse(dateTo);
-        Set<TExchangeRate> exchangeRates = new HashSet<>(tExchangeRateRepository.findByExcRateDateBetween(from, to)); // Fetch from DB
-        return ResponseEntity.ok(exchangeRates.stream()
-                .sorted(Comparator.comparing(TExchangeRate::getExcRateDate))
-                .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 }
