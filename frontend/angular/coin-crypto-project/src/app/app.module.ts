@@ -5,8 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { UserInfoComponent } from './user-info/user-info.component';
 import { RouterModule } from '@angular/router';
-import { routes } from './app.routes';
-import { CommonModule } from '@angular/common'; 
+import { routes } from './app.routes'; 
 
 
 @NgModule({
@@ -15,8 +14,7 @@ import { CommonModule } from '@angular/common';
     UserInfoComponent
   ],
   imports: [
-    BrowserModule,
-    CommonModule,
+    BrowserModule, 
     RouterModule.forRoot(routes)  
   ],
   providers: [

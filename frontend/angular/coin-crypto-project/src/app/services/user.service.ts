@@ -11,6 +11,10 @@ export class UserService {
   private apiUrl = `${environment.apiUrl}/api/coin/users`;
 
   constructor(private http: HttpClient) { }
+ 
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}`);
+  }
 
   getUser(id: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);

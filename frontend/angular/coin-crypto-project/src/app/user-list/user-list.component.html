@@ -1,0 +1,6 @@
+<div class="user-list">
+    <h2>User List</h2>
+    <div *ngFor="let user of users" (click)="goToUserDetail(user.id)" class="user-card">
+      <p><strong>Full Name:</strong> {{ user?.fullName }} <strong>City:</strong> {{ user?.city }} </p> 
+    </div>
+  </div>
