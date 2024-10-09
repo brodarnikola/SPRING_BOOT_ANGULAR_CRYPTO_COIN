@@ -72,9 +72,9 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
 
   filterExchangeRates(): void {
     this.filteredExchangeRates = this.exchangeRates.filter(rate => 
-      (!this.eurFilter || rate.excRateEur.toString().includes(this.eurFilter)) &&
-      (!this.usdFilter || rate.excRateUsd.toString().includes(this.usdFilter)) &&
-      (!this.gbpFilter || rate.excRateGbp.toString().includes(this.gbpFilter))
+      (!this.eurFilter || rate.excRateEur.toString().startsWith(this.eurFilter)) &&
+      (!this.usdFilter || rate.excRateUsd.toString().startsWith(this.usdFilter)) &&
+      (!this.gbpFilter || rate.excRateGbp.toString().startsWith(this.gbpFilter))
     );
   }
 

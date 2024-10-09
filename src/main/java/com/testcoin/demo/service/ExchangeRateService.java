@@ -22,7 +22,7 @@ public class ExchangeRateService {
     public Set<TExchangeRate> getExchangeRates(String dateFrom, String dateTo) {
         LocalDate from = LocalDate.parse(dateFrom);
         LocalDate to = LocalDate.parse(dateTo);
-        Set<TExchangeRate> exchangeRates = new HashSet<>(tExchangeRateRepository.findByExcRateDateBetween(from, to)); // Fetch from DB
+        Set<TExchangeRate> exchangeRates = new HashSet<>(tExchangeRateRepository.findByExcRateDateBetween(from, to));
         return exchangeRates.stream()
                 .sorted(Comparator.comparing(TExchangeRate::getExcRateDate))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
