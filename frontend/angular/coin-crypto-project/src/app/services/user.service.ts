@@ -5,6 +5,7 @@ import { environment } from '../enviroments';
 import { User } from '../model/user';
 import { Wallet } from '../model/wallet';
 import { WalletDetailsResponse } from '../model/walletDetailsResponse';
+import { ExchangeRate } from '../model/exchangeRate';
 
 @Injectable({
   providedIn: 'root'
@@ -29,4 +30,9 @@ export class UserService {
   getWalletDetails(userId: number): Observable<WalletDetailsResponse> {
     return this.http.get<WalletDetailsResponse>(`${this.apiUrl}/wallets/details?idUser=${userId}`);
   }
+
+  getExchangeRates(dateFrom: string, dateTo: string): Observable<ExchangeRate[]> {
+    return this.http.get<ExchangeRate[]>(`${this.apiUrl}/exchange-rates?dateFrom=${dateFrom}&dateTo=${dateTo}`);
+  }
+
 }

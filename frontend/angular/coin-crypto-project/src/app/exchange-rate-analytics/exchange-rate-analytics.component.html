@@ -1,0 +1,32 @@
+<div>
+    <h2>Exchange Rate Analytics</h2>
+    <label for="dateFrom">From:</label>
+    <input type="date" id="dateFrom" [(ngModel)]="dateFrom" (change)="onDateChange()">
+    <label for="dateTo">To:</label>
+    <input type="date" id="dateTo" [(ngModel)]="dateTo" (change)="onDateChange()">
+  
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>EUR Rate</th>
+          <th>EUR Median</th>
+          <th>USD Rate</th>
+          <th>USD Median</th>
+          <th>GBP Rate</th>
+          <th>GBP Median</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let rate of exchangeRates">
+          <td>{{ rate.excRateDate }}</td>
+          <td [style.color]="getColor(rate.excRateEur, eurMedian)">{{ rate.excRateEur }}</td>
+          <td>{{ eurMedian }}</td>
+          <td [style.color]="getColor(rate.excRateUsd, usdMedian)">{{ rate.excRateUsd }}</td>
+          <td>{{ usdMedian }}</td>
+          <td [style.color]="getColor(rate.excRateGbp, gbpMedian)">{{ rate.excRateGbp }}</td>
+          <td>{{ gbpMedian }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
