@@ -3,20 +3,25 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../enviroments';
 import { User } from '../model/user';
+import { Wallet } from '../model/wallet';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = `${environment.apiUrl}/api/coin/users`;
+  private apiUrl = `${environment.apiUrl}/api/coin`;
 
   constructor(private http: HttpClient) { }
  
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}`);
+    return this.http.get<User[]>(`${this.apiUrl}/users`);
   }
 
   getUser(id: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`);
+    return this.http.get<User>(`${this.apiUrl}/users/${id}`);
+  }
+
+  getWallets(userId: number): Observable<Wallet[]> {
+    return this.http.get<Wallet[]>(`${this.apiUrl}/wallets?idUser=${userId}`);
   }
 }

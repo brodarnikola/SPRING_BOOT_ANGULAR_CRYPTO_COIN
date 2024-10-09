@@ -31,6 +31,12 @@ public class TestCoinController {
         tExchangeRateRepository = tExchangeRateRepositoryParam;
     }
 
+    @GetMapping("/users")
+    public ResponseEntity<List<TUser>> getAllUsers() {
+        List<TUser> users = tUserRepository.findAll();  
+        return ResponseEntity.ok(users);
+    }
+
     @GetMapping("/users/{id}")
     public ResponseEntity<TUser> getUser(@PathVariable int id) {
         Optional<TUser> user = tUserRepository.findById(id); // Retrieve from database

@@ -1,9 +1,28 @@
-<div *ngIf="user">
+<div *ngIf="user" class="user-info">
     <h2>User Information</h2>
     <p><strong>Full Name:</strong> {{ user?.fullName }}</p>
     <p><strong>Address:</strong> {{ user?.address }}</p> 
     <p><strong>City:</strong> {{ user?.city }}</p>
     <p><strong>Postal:</strong> {{ user?.postal }}</p> 
+
+    <h3>Wallets</h3>
+    <table *ngIf="wallets.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User id</th>
+          <th>Coin token</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let wallet of wallets">
+          <td>{{ wallet.id }}</td>
+          <td>{{ wallet.idUser }}</td>
+          <td>{{ wallet.coinToken }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="wallets.length === 0">No wallets found for this user.</p> 
   </div>
   <div *ngIf="!user">
     <p>Loading user information...</p>

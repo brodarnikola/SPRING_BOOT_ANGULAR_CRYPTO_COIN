@@ -1,0 +1,54 @@
+.user-list {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .welcome-message {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .welcome-message h1 {
+    color: #2980b9;
+    margin-bottom: 10px;
+  }
+  
+  .welcome-message p {
+    font-size: 18px;
+    color: #7f8c8d;
+  }
+  
+  h2 {
+    color: #2c3e50;
+  }
+  
+  .description {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+  }
+  
+  .user-card {
+    background-color: #ffffff;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .user-card:hover {
+    background-color: #ecf0f1;
+  }
+  
+  .user-name {
+    font-weight: bold;
+    font-size: 18px;
+  }
+  
+  .user-city {
+    color: #34495e;
+  }

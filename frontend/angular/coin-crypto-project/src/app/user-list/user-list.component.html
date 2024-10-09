@@ -1,6 +1,16 @@
+<div class="welcome-message">
+  <h1>Welcome to Coin Crypto Project</h1>
+  <p>This is where you can see all the users that are using Coin, crypto wallets, and exchange rates from the last 2 years. 
+    <br/> I hope you will find all the information you are looking for!</p>
+</div>
+
 <div class="user-list">
-    <h2>User List</h2>
+    <h2>User List</h2> 
+  
     <div *ngFor="let user of users" (click)="goToUserDetail(user.id)" class="user-card">
-      <p><strong>Full Name:</strong> {{ user?.fullName }} <strong>City:</strong> {{ user?.city }} </p> 
+      <p class="user-city">
+        <strong>Full Name:</strong> {{ user?.fullName }} 
+        <strong>City:</strong> {{ user?.city }} 
+      </p> 
     </div>
   </div>
