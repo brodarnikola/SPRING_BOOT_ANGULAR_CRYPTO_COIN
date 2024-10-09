@@ -5,7 +5,12 @@
     <p><strong>City:</strong> {{ user?.city }}</p>
     <p><strong>Postal:</strong> {{ user?.postal }}</p> 
 
+    <h3>Wallet Details</h3>
+    <p><strong>Total Worth:</strong> {{ totalWorth }}</p>
+    <p><strong>Last Purchase:</strong> {{ lastPurchase?.countTimeStamp }}</p>
+
     <h3>Wallets</h3>
+
     <table *ngIf="wallets.length > 0">
       <thead>
         <tr>
@@ -23,6 +28,8 @@
       </tbody>
     </table>
     <p *ngIf="wallets.length === 0">No wallets found for this user.</p> 
+
+
   </div>
   <div *ngIf="!user">
     <p>Loading user information...</p>
