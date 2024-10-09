@@ -12,9 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/coin")
@@ -32,14 +31,14 @@ public class TestCoinController {
         tExchangeRateRepository = tExchangeRateRepositoryParam;
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     public ResponseEntity<TUser> getUser(@PathVariable int id) {
         Optional<TUser> user = tUserRepository.findById(id); // Retrieve from database
         return user.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/wallet")
+    @GetMapping("/wallets")
     public ResponseEntity<Set<TWallet>> getWallet(@RequestParam int idUser) {
 //        Set<TWallet> wallets = testCoinService.getWallet(idUser);
 //        return ResponseEntity.ok(wallets);
@@ -56,6 +55,8 @@ public class TestCoinController {
         LocalDate from = LocalDate.parse(dateFrom);
         LocalDate to = LocalDate.parse(dateTo);
         Set<TExchangeRate> exchangeRates = new HashSet<>(tExchangeRateRepository.findByExcRateDateBetween(from, to)); // Fetch from DB
-        return ResponseEntity.ok(exchangeRates);
+        return ResponseEntity.ok(exchangeRates.stream()
+                .sorted(Comparator.comparing(TExchangeRate::getExcRateDate))
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 }

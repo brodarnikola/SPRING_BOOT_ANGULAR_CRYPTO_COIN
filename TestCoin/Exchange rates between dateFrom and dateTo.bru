@@ -1,0 +1,16 @@
+meta {
+  name: Exchange rates between dateFrom and dateTo
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:9000/api/coin/exchange-rates?dateFrom=2022-10-09&dateTo=2024-10-09
+  body: none
+  auth: none
+}
+
+params:query {
+  dateFrom: 2022-10-09
+  dateTo: 2024-10-09
+}

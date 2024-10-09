@@ -94,7 +94,7 @@ public class InitialCoinImport implements Runnable {
     }
 
     private void generateWallets() {
-        for (int i = 0; i < 5; i++) { // Generate 500 wallets
+        for (int i = 0; i < 3; i++) { // Generate 500 wallets
             Set<TWallet> wallets = testCoinService.getWallet(i + 1);
             tWalletRepository.saveAll(wallets);
         }
