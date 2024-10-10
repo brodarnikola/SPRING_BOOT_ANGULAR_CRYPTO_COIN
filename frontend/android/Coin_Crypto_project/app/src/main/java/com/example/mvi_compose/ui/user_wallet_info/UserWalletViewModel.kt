@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.repositories.UserRepoImpl
 import com.example.mvi_compose.network.NetworkResult
 import com.example.mvi_compose.network.data.UserResponse
-import com.example.mvi_compose.repositories.ExchangeRatesRepoImpl
+import com.example.mvi_compose.network.data.WalletResponse
+import com.example.mvi_compose.repositories.WalletsRepoImpl
 import com.example.mvi_compose.ui.BaseViewModel
 import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserWalletViewModel @Inject constructor(
     private val userRepo: UserRepoImpl,
-    private val exchangeRatesRepo: ExchangeRatesRepoImpl
+    private val walletRepo: WalletsRepoImpl,
 ) : BaseViewModel<UserWalletState, UserWalletEvents>() {
 
     override fun initialState(): UserWalletState {
@@ -31,16 +32,16 @@ class UserWalletViewModel @Inject constructor(
     }
 
 //    init {
-//        onEvent(UserWalletEvents.FecthUserById)
+//        onEvent(UserWalletEvents.FetchUserById)
 //    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onEvent(event: UserWalletEvents) {
         when (event) {
-            is UserWalletEvents.FecthUserById -> {
+            is UserWalletEvents.FetchUserById -> {
                 _state.update { it.copy(loading = true) }
                 viewModelScope.launch(Dispatchers.IO) {
-                    delay(1500)
+                    delay(500)
                     when (val result = userRepo.getUserById(event.userId)) {
 
                         is NetworkResult.Error -> {
@@ -59,29 +60,95 @@ class UserWalletViewModel @Inject constructor(
                             withContext(Dispatchers.Main) {
                                 _state.update {
                                     it.copy(
-                                        loading = false,
                                         user = result.data
                                     )
                                 }
+                                onEvent(UserWalletEvents.FetchWalletDetailsByUserId(event.userId))
+                                onEvent(UserWalletEvents.FetchWalletDetails(event.userId))
+
                             }
-                            sendUiEvent(UiEffect.ShowToast("Fetched all users"))
                         }
                     }
                 }
             }
+            is UserWalletEvents.FetchWalletDetailsByUserId -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    when (val result = walletRepo.getWalletInfoByUserId(event.userId.toInt())) {
+
+                        is NetworkResult.Error -> {
+                            Log.d("coin_crypto", "apiError is: ${result.apiError}")
+                            Log.d("coin_crypto", "message is: ${result.message}")
+                            _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
+                        }
+
+                        is NetworkResult.Exception -> {
+                            Log.d("coin_crypto", "apiError is 1: ${result.e}")
+                            Log.d("coin_crypto", "message is 2: ${result.e.localizedMessage}")
+                            _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
+                        }
+
+                        is NetworkResult.Success -> {
+                            withContext(Dispatchers.Main) {
+                                _state.update {
+                                    it.copy(
+                                        loading = false,
+                                        walletInfo = result.data
+                                    )
+                                }
+                            }
+                            sendUiEvent(UiEffect.ShowToast("Fetched all wallet details"))
+                        }
+                    }
+                }
+            }
+
+            is UserWalletEvents.FetchWalletDetails -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    when (val result = walletRepo.getWallets(event.userId.toInt())) {
+
+                        is NetworkResult.Error -> {
+                            Log.d("coin_crypto", "apiError is: ${result.apiError}")
+                            Log.d("coin_crypto", "message is: ${result.message}")
+                            _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
+                        }
+
+                        is NetworkResult.Exception -> {
+                            Log.d("coin_crypto", "apiError is 1: ${result.e}")
+                            Log.d("coin_crypto", "message is 2: ${result.e.localizedMessage}")
+                            _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
+                        }
+
+                        is NetworkResult.Success -> {
+                            withContext(Dispatchers.Main) {
+                                _state.update {
+                                    it.copy(
+                                        loading = false,
+                                        walletList = result.data.toMutableStateList()
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             else -> {}
         }
     }
 }
 
 sealed class UserWalletEvents {
-    class FecthUserById(val userId: Long): UserWalletEvents()
+    class FetchUserById(val userId: Long): UserWalletEvents()
+    class FetchWalletDetails(val userId: Long): UserWalletEvents()
+    class FetchWalletDetailsByUserId(val userId: Long): UserWalletEvents()
 }
 
 data class UserWalletState(
 
     val user: UserResponse = UserResponse(0, "", "", "", "", 0),
-    val users: MutableList<UserResponse> = mutableListOf(),
+    val walletInfo: WalletResponse = WalletResponse(0, 0, "", ""),
+
+    val walletList: MutableList<WalletResponse> = mutableListOf(),
 
     val loading: Boolean = false,
     val error: String = ""

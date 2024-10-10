@@ -5,9 +5,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mvi_compose.R
-import com.example.mvi_compose.network.data.UserResponse
+import com.example.mvi_compose.network.data.WalletResponse
 import com.example.mvi_compose.ui.UiEffect
 import com.example.mvi_compose.ui.coin_cryptos.UserWalletEvents
 import com.example.mvi_compose.ui.coin_cryptos.UserWalletViewModel
@@ -38,7 +38,7 @@ fun UserWalletInfoScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.onEvent(UserWalletEvents.FecthUserById(userId))
+        viewModel.onEvent(UserWalletEvents.FetchUserById(userId))
     }
 
     LaunchedEffect(key1 = Unit) {
@@ -56,11 +56,13 @@ fun UserWalletInfoScreen(
             LoadingScreen()
         } else if (userWalletState.error.isNotEmpty()) {
             ErrorScreen(error = userWalletState.error)
-        } else if (userWalletState.users.isNotEmpty()) {
+        } else if (userWalletState.walletList.isNotEmpty()) {
             ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (welcomeText, userList, checkExchangeRates) = createRefs()
+
+                val (welcomeText, userInfo, walletInfo, userList) = createRefs()
                 val backgroundColor = colorResource(R.color.teal_700)
 
+                // Welcome Text
                 Text(
                     text = "User and wallet info",
                     modifier = Modifier
@@ -68,7 +70,6 @@ fun UserWalletInfoScreen(
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
-                            bottom.linkTo(userList.top)
                         }
                         .padding(10.dp)
                         .background(backgroundColor)
@@ -77,51 +78,127 @@ fun UserWalletInfoScreen(
                     color = Color.White
                 )
 
-                val finalUsersList = remember { userWalletState.users }
-                val listState = rememberLazyListState()
+                // User Info
+                if (userWalletState.user.postal.isNotEmpty()) {
+                    Text(
+                        text = userWalletState.user.postal,
+                        modifier = Modifier
+                            .constrainAs(userInfo) {
+                                top.linkTo(welcomeText.bottom)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            }
+                            .padding(10.dp)
+                            .background(backgroundColor),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
+                }
 
+                // Wallet Info
+//                if (userWalletState.walletInfo.idUser > 0) {
+//                    Text(
+//                        text = userWalletState.walletInfo.idUser.toString(), // Customize display as needed
+//                        modifier = Modifier
+//                            .constrainAs(walletInfo) {
+//                                top.linkTo(userInfo.bottom)
+//                                start.linkTo(parent.start)
+//                                end.linkTo(parent.end)
+//                            }
+//                            .padding(10.dp)
+//                            .background(backgroundColor),
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        color = Color.White
+//                    )
+//                }
+
+                // LazyColumn for walletList
+                if (userWalletState.walletList.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .constrainAs(userList) {
+                                top.linkTo(userInfo.bottom)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+//                                bottom.linkTo(parent.bottom)
+                            }
+                            .wrapContentSize()
+                            .padding(8.dp)
+                    ) {
+
+                        items(
+                            items = userWalletState.walletList,
+                            key = { wallet -> wallet.id }
+                        ) { wallet ->
+                            MoviesListScreen(
+                                user = wallet,
+                                backgroundColor = backgroundColor
+                            )
+                        }
+                    }
+                }
+
+//                val (welcomeText, userList, checkExchangeRates) = createRefs()
+//                val backgroundColor = colorResource(R.color.teal_700)
+//
+//                Text(
+//                    text = "User and wallet info",
+//                    modifier = Modifier
+//                        .constrainAs(welcomeText) {
+//                            top.linkTo(parent.top)
+//                            start.linkTo(parent.start)
+//                            end.linkTo(parent.end)
+////                            bottom.linkTo(userList.top)
+//                        }
+//                        .padding(10.dp)
+//                        .background(backgroundColor)
+//                        .padding(10.dp),
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = Color.White
+//                )
+//
+//
+//
+//                Text(
+//                    text = userWalletState.user.postal,
+//                    modifier = Modifier
+//                        .constrainAs(checkExchangeRates) {
+//                            top.linkTo(welcomeText.bottom)
+//                            start.linkTo(parent.start)
+//                            end.linkTo(parent.end)
+//                        }
+//                        .padding(10.dp)
+//                        .background(backgroundColor),
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = Color.White
+//                )
+//
+//                val walletList = remember { userWalletState.walletList }
+//                val listState = rememberLazyListState()
+//
 //                LazyColumn(
 //                    state = listState,
 //                    modifier = Modifier
 //                        .constrainAs(userList) {
-//                            top.linkTo(welcomeText.bottom)
+//                            top.linkTo(checkExchangeRates.bottom)
 //                            start.linkTo(parent.start)
 //                            end.linkTo(parent.end)
-//                            bottom.linkTo(checkExchangeRates.top)
+//                            bottom.linkTo(parent.bottom)
 //                        }
+//                        .wrapContentSize()
 //                        .padding(8.dp),
 //                    verticalArrangement = Arrangement.spacedBy(4.dp)
 //                ) {
 //                    items(
-//                        items = finalUsersList,
+//                        items = walletList,
 //                        key = { user -> user.id }
 //                    ) { user ->
 //                        MoviesListScreen(
-//                            onUserClick = onUserClick,
 //                            user = user,
 //                            backgroundColor = backgroundColor
 //                        )
 //                    }
 //                }
-//
-//                Text(
-//                    text = "Check exchange rates",
-//                    modifier = Modifier
-//                        .constrainAs(checkExchangeRates) {
-//                            top.linkTo(userList.bottom)
-//                            start.linkTo(parent.start)
-//                            end.linkTo(parent.end)
-//                            bottom.linkTo(parent.bottom)
-//                        }
-//                        .padding(10.dp)
-//                        .background(backgroundColor)
-//                        .clickable(onClick = {
-//                            Log.d("USER_ID", "onExchangeRateClick:  ")
-//                            onExchangeRateClick()
-//                        }),
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = Color.White
-//                )
             }
         }
     }
@@ -129,23 +206,18 @@ fun UserWalletInfoScreen(
 
 @Composable
 fun MoviesListScreen(
-    onUserClick: (id: Long) -> Unit,
-    user: UserResponse,
+    user: WalletResponse,
     backgroundColor: Color,
 ) {
     Log.d("USER_ID", "Recompose user id is 1: ${user.id.toLong()}")
 
     Text(
-        text = "Full Name: ${user.fullName} \nCity is: ${user.city}",
+        text = "Full Name: ${user.coinToken} \nCity is: ${user.countTimeStamp}",
         fontSize = 14.sp,
         modifier = Modifier
             .padding(horizontal = 40.dp, vertical = 10.dp)
             .background(backgroundColor)
-            .padding(10.dp)
-            .clickable(onClick = {
-                Log.d("USER_ID", "User id is 11: ${user.id}")
-                onUserClick(user.id.toLong())
-            }),
+            .padding(10.dp) ,
         color = Color.White
     )
 }

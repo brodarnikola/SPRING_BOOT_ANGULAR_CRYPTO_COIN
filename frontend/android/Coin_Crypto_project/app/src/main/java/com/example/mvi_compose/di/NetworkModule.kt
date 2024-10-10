@@ -4,6 +4,7 @@ import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.di.MovieNetwork
 import com.example.mvi_compose.network.ExchangeRatesApi
 import com.example.mvi_compose.network.UsersApi
+import com.example.mvi_compose.network.WalletsApi
 import com.example.mvi_compose.util.AppConstants
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
@@ -66,6 +67,10 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideExchangeRatesService( retrofit: Retrofit): ExchangeRatesApi = retrofit.create(ExchangeRatesApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideWalletsService( retrofit: Retrofit): WalletsApi = retrofit.create(WalletsApi::class.java)
 }
 
 @Retention(AnnotationRetention.RUNTIME)
