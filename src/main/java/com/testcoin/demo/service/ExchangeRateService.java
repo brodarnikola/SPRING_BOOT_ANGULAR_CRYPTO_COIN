@@ -24,7 +24,7 @@ public class ExchangeRateService {
         LocalDate to = LocalDate.parse(dateTo);
         Set<TExchangeRate> exchangeRates = new HashSet<>(tExchangeRateRepository.findByExcRateDateBetween(from, to));
         return exchangeRates.stream()
-                .sorted(Comparator.comparing(TExchangeRate::getExcRateDate))
+                .sorted(Comparator.comparing(TExchangeRate::getExcRateDate).reversed())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }
