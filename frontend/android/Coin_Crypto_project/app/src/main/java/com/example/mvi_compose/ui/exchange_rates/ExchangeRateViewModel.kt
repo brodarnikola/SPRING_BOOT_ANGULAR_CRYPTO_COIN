@@ -27,9 +27,6 @@ class ExchangeRateViewModel @Inject constructor(
     private val exchangeRatesRepo: ExchangeRatesRepoImpl
 ) : BaseViewModel<ExchangeRateState, ExchangeRatesEvents>() {
 
-    var dateFrom = mutableStateOf("")
-    var dateTo = mutableStateOf("")
-
     override fun initialState(): ExchangeRateState {
         return ExchangeRateState()
     }
@@ -61,10 +58,18 @@ class ExchangeRateViewModel @Inject constructor(
 
                         is NetworkResult.Success -> {
                             withContext(Dispatchers.Main) {
+
                                 val exchangeRates = result.data.toMutableStateList()
-                                val eurMedian = calculateMedian(exchangeRates.map { it.excRateEur })
-                                val usdMedian = calculateMedian(exchangeRates.map { it.excRateUsd })
-                                val gbpMedian = calculateMedian(exchangeRates.map { it.excRateGbp })
+                                // Keep the original data for filtering later
+                                _state.update {
+                                    it.copy(
+                                        originalExchangeRates = exchangeRates
+                                    )
+                                }
+
+                                val eurMedian = calculateMedian(exchangeRates, "EUR")
+                                val usdMedian = calculateMedian(exchangeRates, "USD")
+                                val gbpMedian = calculateMedian(exchangeRates, "GBP")
 
                                 _state.update {
                                     it.copy(
@@ -86,21 +91,49 @@ class ExchangeRateViewModel @Inject constructor(
         }
     }
 
-    fun onDateChange() {
-        onEvent(ExchangeRatesEvents.FetchAllExchangeRates)
-//        fetchExchangeRates()
+    fun applyFilters(eurFilter: String, usdFilter: String, gbpFilter: String, dateFromFilter: String, dateToFilter: String) {
+        val filteredRates = _state.value.originalExchangeRates.filter { rate ->
+            (eurFilter.isEmpty() || rate.excRateEur.toString().startsWith(eurFilter)) &&
+                    (usdFilter.isEmpty() || rate.excRateUsd.toString().startsWith(usdFilter)) &&
+                    (gbpFilter.isEmpty() || rate.excRateGbp.toString().startsWith(gbpFilter)) &&
+                    (dateFromFilter.isEmpty() || rate.excRateDate >= dateFromFilter) &&
+                    (dateToFilter.isEmpty() || rate.excRateDate <= dateToFilter)
+        }
+
+        _state.update { it.copy(exchangeRates = filteredRates.toMutableList()) }
+    }
+
+}
+
+fun calculateMedian(rates: List<ExchangeRatesResponse>, currencyType: String): Float {
+    val sortedRates = when (currencyType) {
+        "EUR" -> rates.map { it.excRateEur }.sorted()
+        "USD" -> rates.map { it.excRateUsd }.sorted()
+        "GBP" -> rates.map { it.excRateGbp }.sorted()
+        else -> emptyList()
+    }
+
+    return if (sortedRates.isNotEmpty()) {
+        val middle = sortedRates.size / 2
+        if (sortedRates.size % 2 == 0) {
+            (sortedRates[middle - 1] + sortedRates[middle]) / 2
+        } else {
+            sortedRates[middle]
+        }
+    } else {
+        0f // Handle empty case
     }
 }
 
-private fun calculateMedian(values: List<Float>): Float {
-    val sortedValues = values.sorted()
-    val mid = sortedValues.size / 2
-    return if (sortedValues.size % 2 == 0) {
-        (sortedValues[mid - 1] + sortedValues[mid]) / 2
-    } else {
-        sortedValues[mid]
-    }
-}
+//private fun calculateMedian(values: List<Float>): Float {
+//    val sortedValues = values.sorted()
+//    val mid = sortedValues.size / 2
+//    return if (sortedValues.size % 2 == 0) {
+//        (sortedValues[mid - 1] + sortedValues[mid]) / 2
+//    } else {
+//        sortedValues[mid]
+//    }
+//}
 
 sealed class ExchangeRatesEvents {
     object FetchAllExchangeRates: ExchangeRatesEvents()
@@ -112,6 +145,7 @@ data class ExchangeRateState(
     val usdMedian: Float = 0f,
     val gbpMedian: Float = 0f,
     val exchangeRates: MutableList<ExchangeRatesResponse> = mutableListOf(),
+    val originalExchangeRates: MutableList<ExchangeRatesResponse> = mutableListOf(),
 
     val loading: Boolean = false,
     val error: String = ""

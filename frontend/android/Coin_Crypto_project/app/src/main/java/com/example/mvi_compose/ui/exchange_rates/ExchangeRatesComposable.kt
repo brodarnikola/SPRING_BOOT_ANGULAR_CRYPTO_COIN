@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +24,7 @@ import com.example.mvi_compose.R
 import com.example.mvi_compose.network.data.ExchangeRatesResponse
 import com.example.mvi_compose.ui.UiEffect
 import com.example.mvi_compose.ui.coin_cryptos.ExchangeRateViewModel
+import com.example.mvi_compose.ui.dialogs.FilterDialog
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -64,14 +62,14 @@ fun ExchangeRatesScreen(viewModel: ExchangeRateViewModel) {
                 val (filterSection, exchangeRatesListRef) = createRefs()
                 val backgroundColor = colorResource(R.color.teal_700)
 
-
                 Row(modifier = Modifier
                     .constrainAs(filterSection) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
-                    },
-                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    }
+                    .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround) {
                     Text(
                         text = "Exchange Rate Analytics",
                         modifier = Modifier
@@ -80,6 +78,8 @@ fun ExchangeRatesScreen(viewModel: ExchangeRateViewModel) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White
                     )
+
+                    Spacer(modifier = Modifier.width(16.dp))
 
                     Text(
                         text = "Filter",
@@ -92,14 +92,6 @@ fun ExchangeRatesScreen(viewModel: ExchangeRateViewModel) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White
                     )
-                }
-
-                val filteredExchangeRates = exchangeRateState.exchangeRates.filter { rate ->
-                    (eurFilter.isEmpty() || rate.excRateEur.toString().startsWith(eurFilter)) &&
-                            (usdFilter.isEmpty() || rate.excRateUsd.toString()
-                                .startsWith(usdFilter)) &&
-                            (gbpFilter.isEmpty() || rate.excRateGbp.toString()
-                                .startsWith(gbpFilter))
                 }
 
                 val listState = rememberLazyListState()
@@ -117,7 +109,7 @@ fun ExchangeRatesScreen(viewModel: ExchangeRateViewModel) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(
-                        items = filteredExchangeRates,
+                        items = exchangeRateState.exchangeRates,
                         key = { rate -> rate.id }
                     ) { rate ->
                         ExchangeRateItem(
@@ -140,139 +132,11 @@ fun ExchangeRatesScreen(viewModel: ExchangeRateViewModel) {
                 eurFilter = eur
                 usdFilter = usd
                 gbpFilter = gbp
-                viewModel.dateFrom.value = dateFrom
-                viewModel.dateTo.value = dateTo
-                viewModel.onDateChange()
+                viewModel.applyFilters(eurFilter, usdFilter, gbpFilter, dateFrom, dateTo)
                 showDialog = false
             },
-            dateFrom = viewModel.dateFrom.value,
-            dateTo = viewModel.dateTo.value
         )
     }
-}
-
-@Composable
-fun FilterDialog(
-    onDismiss: () -> Unit,
-    onApply: (String, String, String, String, String) -> Unit,
-    dateFrom: String,
-    dateTo: String
-) {
-    var eurFilter by remember { mutableStateOf("") }
-    var usdFilter by remember { mutableStateOf("") }
-    var gbpFilter by remember { mutableStateOf("") }
-    var dateFromState by remember { mutableStateOf(dateFrom) }
-    var dateToState by remember { mutableStateOf(dateTo) }
-
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Filter Exchange Rates") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = eurFilter,
-                    onValueChange = { eurFilter = it },
-                    label = { Text("EUR Rate Filter") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = usdFilter,
-                    onValueChange = { usdFilter = it },
-                    label = { Text("USD Rate Filter") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = gbpFilter,
-                    onValueChange = { gbpFilter = it },
-                    label = { Text("GBP Rate Filter") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                DatePickerField(
-                    label = "From Date",
-                    date = dateFromState,
-                    onDateChange = { dateFromState = it }
-                )
-                DatePickerField(
-                    label = "To Date",
-                    date = dateToState,
-                    onDateChange = { dateToState = it }
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = {
-                onApply(
-                    eurFilter,
-                    usdFilter,
-                    gbpFilter,
-                    dateFromState,
-                    dateToState
-                )
-            }) {
-                Text("Apply")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-@Composable
-fun DatePickerField(
-    label: String,
-    date: String,
-    onDateChange: (String) -> Unit
-) {
-    val context = LocalContext.current
-    val calendar = java.util.Calendar.getInstance()
-    val dateFormatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-
-    // Parse the initial date
-    val initialDate = try {
-        dateFormatter.parse(date)?.let {
-            calendar.time = it
-            calendar
-        } ?: java.util.Calendar.getInstance()
-    } catch (e: Exception) {
-        java.util.Calendar.getInstance()
-    }
-
-    val year = initialDate.get(java.util.Calendar.YEAR)
-    val month = initialDate.get(java.util.Calendar.MONTH)
-    val day = initialDate.get(java.util.Calendar.DAY_OF_MONTH)
-
-    val datePickerDialog = remember {
-        android.app.DatePickerDialog(
-            context,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                calendar.set(selectedYear, selectedMonth, selectedDay)
-                onDateChange(dateFormatter.format(calendar.time))
-            },
-            year,
-            month,
-            day
-        )
-    }
-
-    OutlinedTextField(
-        value = date,
-        onValueChange = {},
-        label = { Text(label) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { datePickerDialog.show() }, // Open DatePicker on click
-        readOnly = true,
-        trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.DateRange, // Use your icon here
-                contentDescription = "Select date",
-                modifier = Modifier.clickable { datePickerDialog.show() } // Icon click listener
-            )
-        }
-    )
 }
 
 @Composable
@@ -287,36 +151,48 @@ fun ExchangeRateItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9))  // ,
     ) {
         Column(
             modifier = Modifier
-                .background(backgroundColor)
+//                .background(backgroundColor)
                 .padding(16.dp)
         ) {
             Text(
                 text = "Date: ${rate.excRateDate}",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color.White
+                color = Color(0xFF000000)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "EUR Rate: ${rate.excRateEur} (Median: $eurMedian)",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color.White
+                color = getColor(rate.excRateEur, eurMedian)
             )
             Text(
                 text = "USD Rate: ${rate.excRateUsd} (Median: $usdMedian)",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color.White
+                color = getColor(rate.excRateUsd, usdMedian)
             )
             Text(
                 text = "GBP Rate: ${rate.excRateGbp} (Median: $gbpMedian)",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color.White
+                color = getColor(rate.excRateGbp, gbpMedian)
             )
         }
     }
 }
+
+// Function to determine color based on value and median
+@Composable
+fun getColor(rate: Float, median: Float): Color {
+    return when {
+        rate < median -> Color(0xFFFF0000)
+        rate > median -> Color(0xFF008000)
+        else -> Color(0xFF0000FF)
+    }
+}
+
 
 @Composable
 fun LoadingScreen() {
