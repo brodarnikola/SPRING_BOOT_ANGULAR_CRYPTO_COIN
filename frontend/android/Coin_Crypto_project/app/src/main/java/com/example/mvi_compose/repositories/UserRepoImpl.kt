@@ -23,10 +23,6 @@ class UserRepoImpl @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserRepo {
 
-//    override suspend fun getMovieById(movieId: Long): Movie = withContext(ioDispatcher) {
-//        return@withContext movieDao.getMovieById(movieId)
-//    }
-
     override suspend fun getUsers(): NetworkResult<List<UserResponse>> = withContext(ioDispatcher) {
 
         val networkResult = handleNetworkRequest {
@@ -41,19 +37,20 @@ class UserRepoImpl @Inject constructor(
         return@withContext networkResult
     }
 
-//    override suspend fun fetchMovieTrailers(movieId: Int) : NetworkResult<TrailerResponse> = withContext(ioDispatcher) {
-//
-//        val networkResult = handleNetworkRequest {
-//            Log.d(REST_API_CALL,"get movie trailers")
-//            trailerApi.getMovieTrailer(movieId, "Awesome")
-//        }
-//
-//        if( networkResult is NetworkResult.Success ) {
-//            Log.d(REST_API_CALL,"get movie trailers success")
-//        }
-//
-//        return@withContext networkResult
-//    }
+    override suspend fun getUserById(userId: Long): NetworkResult<UserResponse> = withContext(ioDispatcher) {
+
+        val networkResult = handleNetworkRequest {
+            Log.d(REST_API_CALL,"start popular coin crypto")
+            usersApi.getUserById(userId)
+        }
+
+        if( networkResult is NetworkResult.Success ) {
+            Log.d(REST_API_CALL,"get users success")
+        }
+
+        return@withContext networkResult
+    }
+
 
     private suspend fun <T : Any> handleNetworkRequest(apiCall: suspend () -> Response<T>): NetworkResult<T> {
         return try {

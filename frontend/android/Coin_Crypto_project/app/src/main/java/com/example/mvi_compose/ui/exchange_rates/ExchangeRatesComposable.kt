@@ -151,11 +151,10 @@ fun ExchangeRateItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9))  // ,
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFe9e5e5) )
     ) {
         Column(
             modifier = Modifier
-//                .background(backgroundColor)
                 .padding(16.dp)
         ) {
             Text(

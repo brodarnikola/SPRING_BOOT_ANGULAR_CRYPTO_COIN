@@ -16,8 +16,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,7 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.mvi_compose.ui.exchange_rates.ExchangeRatesScreen
-import com.example.mvi_compose.ui.users.MovieDetailsScreen
+import com.example.mvi_compose.ui.user_wallet_info.UserWalletInfoScreen
 import com.example.mvi_compose.ui.users.UsersScreen
 
 data class BottomNavigationBarItem(
@@ -41,40 +39,23 @@ data class BottomNavigationBarItem(
     val badgeAmount: Int? = null
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun MainComposeApp(
 ) {
     val appState = rememberMainAppState()
 
-    val showBottomBar = rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry =
         appState.navController.currentBackStackEntryAsState() // navController.currentBackStackEntryAsState()
 
-    showBottomBar.value = when {
-        navBackStackEntry.value?.destination?.route?.contains(MainDestinations.MOVIE_DETAILS) == true -> false
-        else -> true
-    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
 
-        Scaffold(
-//            bottomBar = {
-//                if (showBottomBar.value) {
-//                    TabView(
-//                        bottomNavigationItems,
-//                        navBackStackEntry)
-//                    { route ->
-//                        Log.d("MENU", "route is: $route")
-//                        appState.navigateToRoute(route)
-//                    }
-//                }
-//            },
-        ) { paddingValues ->
+        Scaffold()
+        { paddingValues ->
             NavHost(
                 navController = appState.navController,
                 startDestination = MainDestinations.HOME,
@@ -82,11 +63,11 @@ fun MainComposeApp(
             ) {
                 mainNavGraph(
                     navBackStackEntry = navBackStackEntry,
-                    goToExchangeRates =  { route ->
+                    goToExchangeRates = { route ->
                         appState.navigateToExchangeRates(route = route)
                     },
-                    goToMovieDetails =  { route, movieId ->
-                        appState.navigateToMovieDetails(route = route, movieId = movieId)
+                    goToUserWalletInfo = { route, movieId ->
+                        appState.navigateToUserWalletInfo(route = route, movieId = movieId)
                     },
                     navigateUp = {
                         appState.upPress()
@@ -97,11 +78,12 @@ fun MainComposeApp(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.mainNavGraph(
     navBackStackEntry: State<NavBackStackEntry?>,
-    goToMovieDetails: (route: String, movieId: Long) -> Unit,
+    goToUserWalletInfo: (route: String, movieId: Long) -> Unit,
     goToExchangeRates: (route: String) -> Unit,
-    navigateUp:() -> Unit
+    navigateUp: () -> Unit
 ) {
     composable(MainDestinations.HOME) {
         UsersScreen(
@@ -109,9 +91,9 @@ fun NavGraphBuilder.mainNavGraph(
             onExchangeRateClick = {
                 goToExchangeRates(MainDestinations.EXCHANGE_RATES)
             },
-            onUserClick = { movieId ->
+            onUserClick = { userId ->
                 if (navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
-                    goToMovieDetails(MainDestinations.MOVIE_DETAILS,  movieId)
+                    goToUserWalletInfo(MainDestinations.USER_WALLET_INFO, userId)
                 }
             })
     }
@@ -121,19 +103,34 @@ fun NavGraphBuilder.mainNavGraph(
     }
 
     composable(
-        "${MainDestinations.MOVIE_DETAILS}/{${NavArguments.MOVIE_ID}}",
-        arguments = listOf(navArgument(NavArguments.MOVIE_ID) {
+        "${MainDestinations.USER_WALLET_INFO}/{${NavArguments.USER_ID}}",
+        arguments = listOf(navArgument(NavArguments.USER_ID) {
             type = NavType.LongType
         })
-    ) {
-        MovieDetailsScreen(
+    ) { backStackEntry ->
+        val userId = backStackEntry.arguments?.getLong(NavArguments.USER_ID) ?: 0L
+        UserWalletInfoScreen(
             viewModel = hiltViewModel(),
-            navigateUp = {
-                navigateUp()
-            }
+            userId = userId
+//            navigateUp = {
+//                navigateUp()
+//            }
         )
     }
 
+//    composable(
+//        "${MainDestinations.MOVIE_DETAILS}/{${NavArguments.MOVIE_ID}}",
+//        arguments = listOf(navArgument(NavArguments.MOVIE_ID) {
+//            type = NavType.LongType
+//        })
+//    ) {
+//        MovieDetailsScreen(
+//            viewModel = hiltViewModel(),
+//            navigateUp = {
+//                navigateUp()
+//            }
+//        )
+//    }
 
 
 }

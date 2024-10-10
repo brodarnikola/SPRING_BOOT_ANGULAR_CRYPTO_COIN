@@ -10,14 +10,11 @@ import androidx.navigation.compose.rememberNavController
 object MainDestinations {
     const val HOME = "Home"
     const val EXCHANGE_RATES = "ExchangeRates"
-    const val LOCATION = "Location"
-    const val SETTINGS = "Settings"
-    const val MOVIE_DETAILS = "MovieDetails"
-    const val ANDROID_POSSIBILITIES = "Android possibilities"
+    const val USER_WALLET_INFO = "UserWalletInfo"
 }
 
 object NavArguments {
-    const val MOVIE_ID = "movieId"
+    const val USER_ID = "userId"
 }
 
 @Composable
@@ -42,7 +39,7 @@ class MainAppState(
         }
     }
 
-    fun navigateToMovieDetails(route: String, movieId: Long) {
+    fun navigateToUserWalletInfo(route: String, movieId: Long) {
         if (route != currentRoute) {
             navController.navigate("$route/$movieId") {
                 launchSingleTop = true
