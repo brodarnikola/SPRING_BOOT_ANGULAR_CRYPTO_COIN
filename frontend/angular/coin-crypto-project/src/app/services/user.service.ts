@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../enviroments';
 import { User } from '../model/user';
-import { Wallet } from '../model/wallet';
-import { WalletDetailsResponse } from '../model/walletDetailsResponse';
-import { ExchangeRate } from '../model/exchangeRate';
+// import { Wallet } from '../model/wallet';
+// import { WalletDetailsResponse } from '../model/walletDetailsResponse';
+// import { ExchangeRate } from '../model/exchangeRate';
 
 @Injectable({
   providedIn: 'root'
@@ -23,16 +23,16 @@ export class UserService {
     return this.http.get<User>(`${this.apiUrl}/users/${id}`);
   }
 
-  getWallets(userId: number): Observable<Wallet[]> {
-    return this.http.get<Wallet[]>(`${this.apiUrl}/wallets?idUser=${userId}`);
-  }
+  // getWallets(userId: number): Observable<Wallet[]> {
+  //   return this.http.get<Wallet[]>(`${this.apiUrl}/wallets?idUser=${userId}`);
+  // }
 
-  getWalletDetails(userId: number): Observable<WalletDetailsResponse> {
-    return this.http.get<WalletDetailsResponse>(`${this.apiUrl}/wallets/details?idUser=${userId}`);
-  }
+  // getWalletDetails(userId: number): Observable<WalletDetailsResponse> {
+  //   return this.http.get<WalletDetailsResponse>(`${this.apiUrl}/wallets/details?idUser=${userId}`);
+  // }
 
-  getExchangeRates(dateFrom: string, dateTo: string): Observable<ExchangeRate[]> {
-    return this.http.get<ExchangeRate[]>(`${this.apiUrl}/exchange-rates?dateFrom=${dateFrom}&dateTo=${dateTo}`);
-  }
+  // getExchangeRates(dateFrom: string, dateTo: string): Observable<ExchangeRate[]> {
+  //   return this.http.get<ExchangeRate[]>(`${this.apiUrl}/exchange-rates?dateFrom=${dateFrom}&dateTo=${dateTo}`);
+  // }
 
 }

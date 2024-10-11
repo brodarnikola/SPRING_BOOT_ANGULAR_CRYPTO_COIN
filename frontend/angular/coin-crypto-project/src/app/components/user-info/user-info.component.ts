@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router'; 
+import { ActivatedRoute } from '@angular/router';  
 import { UserService } from '../../services/user.service';
+import { WalletService } from '../../services/wallet.service';
 import { User } from '../../model/user';
 import { Wallet } from '../../model/wallet'; // Assuming you have a Wallet model
 import { CommonModule } from '@angular/common';
@@ -19,7 +20,7 @@ export class UserInfoComponent implements OnInit {
   totalWorth: number = 0;
   lastPurchase: Wallet | undefined;
 
-  constructor(private route: ActivatedRoute, private userService: UserService) {
+  constructor(private route: ActivatedRoute, private walletService: WalletService, private userService: UserService) {
 
    }
 
@@ -39,7 +40,7 @@ export class UserInfoComponent implements OnInit {
   }
   
   fetchWallets(userId: number): void {
-    this.userService.getWallets(userId).subscribe(
+    this.walletService.getWallets(userId).subscribe(
       (data: Wallet[]) => {
         console.log('Fetched wallet data:', data); 
         this.wallets = data;
@@ -49,7 +50,7 @@ export class UserInfoComponent implements OnInit {
   }
 
   fetchWalletDetails(userId: number): void {
-    this.userService.getWalletDetails(userId).subscribe(
+    this.walletService.getWalletDetails(userId).subscribe(
       (data: WalletDetailsResponse) => {
         console.log('Fetched wallet details:', data);
         this.wallets = data.wallets.sort((a, b) => new Date(b.countTimeStamp).getTime() - new Date(a.countTimeStamp).getTime());

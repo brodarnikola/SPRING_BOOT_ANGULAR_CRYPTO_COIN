@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { UserService } from '../../services/user.service';
+import { Component, OnInit } from '@angular/core'; 
+import { ExchangeRateService } from '../../services/exchange-rate.service';
 import { ExchangeRate } from '../../model/exchangeRate';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
@@ -26,7 +26,7 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
   usdFilter: string = '';
   gbpFilter: string = '';
  
-  constructor(private userService: UserService) { }
+  constructor( private exchangeRateService: ExchangeRateService) { }
 
   ngOnInit(): void {
     const today = new Date();
@@ -37,7 +37,7 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
   }
 
   fetchExchangeRates(): void {
-    this.userService.getExchangeRates(this.dateFrom, this.dateTo).subscribe(
+    this.exchangeRateService.getExchangeRates(this.dateFrom, this.dateTo).subscribe(
       (data: ExchangeRate[]) => {
         this.exchangeRates = data;
         this.filteredExchangeRates = data;
