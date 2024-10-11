@@ -31,7 +31,7 @@ public class ExchangeRateService {
     }
 
     public Page<TExchangeRate> getPaginatedExchangeRates(String dateFrom, String dateTo, Pageable pageable) {
-        // Convert String to LocalDate
+
         LocalDate startDate = LocalDate.parse(dateFrom);
         LocalDate endDate = LocalDate.parse(dateTo);
 

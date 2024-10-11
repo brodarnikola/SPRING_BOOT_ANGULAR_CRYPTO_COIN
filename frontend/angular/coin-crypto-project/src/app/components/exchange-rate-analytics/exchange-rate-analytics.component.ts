@@ -27,9 +27,10 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
   usdFilter: string = '';
   gbpFilter: string = '';
  
-  currentPage: number = 0;
+  currentPage: number = 1;
   totalPages: number = 0;
   pageSize: number = 30;
+  pageInput: number = 1;
  
   constructor( private exchangeRateService: ExchangeRateService) { }
 
@@ -39,7 +40,7 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
     this.dateFrom = twoYearsAgo.toISOString().split('T')[0];
     this.dateTo = today.toISOString().split('T')[0];
     // this.fetchExchangeRates();
-
+ 
     this.fetchPaginatedExchangeRates();
   }
 
@@ -47,20 +48,52 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
     this.exchangeRateService.getPaginatedExchangeRates(this.dateFrom, this.dateTo, this.currentPage, this.pageSize)
       .subscribe(
         (page: Page<ExchangeRate>) => {
-          this.exchangeRates = page.content;
-          
-        this.filteredExchangeRates = page.content;
+          this.exchangeRates = page.content; 
+          this.filteredExchangeRates = page.content;
           this.totalPages = page.totalPages;
+          this.pageInput = this.currentPage;
           this.calculateMedians();
         },
         (error) => console.error('Error fetching paginated exchange rates', error)
       );
+  } 
+
+  goToFirstPage(): void {
+    this.currentPage = 1;
+    this.pageInput = this.currentPage; 
+    this.fetchPaginatedExchangeRates();
   }
 
-  goToPage(pageNumber: number): void {
-    if (pageNumber >= 0 && pageNumber < this.totalPages) {
-      this.currentPage = pageNumber;
+  goToLastPage(): void {
+    this.currentPage = this.totalPages;
+    this.pageInput = this.currentPage; 
+    this.fetchPaginatedExchangeRates();
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.pageInput = this.currentPage; 
       this.fetchPaginatedExchangeRates();
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.pageInput = this.currentPage;
+      this.fetchPaginatedExchangeRates();
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.pageInput = this.currentPage; 
+      this.fetchPaginatedExchangeRates();
+    }
+    else {
+      alert(`Please enter a valid page number between 1 and ${this.totalPages}`);
     }
   }
 
