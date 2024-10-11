@@ -28,6 +28,7 @@ import com.example.mvi_compose.ui.users.ErrorScreen
 import com.example.mvi_compose.ui.users.LoadingScreen
 import com.example.mvi_compose.util.BackgroundColor
 import com.example.mvi_compose.util.TextBlackColor
+import com.example.mvi_compose.util.formatDateTime
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -68,7 +69,6 @@ fun UserWalletInfoScreen(
                 val (welcomeText, userInfo, walletInfo, spacer, userList) = createRefs()
                 val backgroundColor = colorResource(R.color.teal_700)
 
-                // Welcome Text
                 Card(
                     modifier = Modifier
                         .constrainAs(welcomeText) {
@@ -88,63 +88,67 @@ fun UserWalletInfoScreen(
                 }
 
                 // User Info
-                Column(
+                Card(
                     modifier = Modifier
                         .constrainAs(userInfo) {
                             top.linkTo(welcomeText.bottom, margin = 5.dp)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }
-                        .padding(10.dp)
-                        .background(BackgroundColor)
-                        .padding(10.dp)
+                        .padding(10.dp),
+                    colors = CardDefaults.cardColors(containerColor = BackgroundColor)
                 ) {
-                    Text(
-                        text = "Full Name: ${userWalletState.user.fullName}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextBlackColor
-                    )
-                    Text(
-                        text = "Address: ${userWalletState.user.address}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextBlackColor
-                    )
-                    Text(
-                        text = "City: ${userWalletState.user.city} Postal: ${userWalletState.user.postal}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextBlackColor
-                    )
-//                    Text(
-//                        text = "Postal: ${userWalletState.user.postal}",
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        color = TextBlackColor
-//                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(10.dp)
+                    ) {
+                        Text(
+                            text = "Full Name: ${userWalletState.user.fullName}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextBlackColor
+                        )
+                        Text(
+                            text = "Address: ${userWalletState.user.address}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextBlackColor
+                        )
+                        Text(
+                            text = "City: ${userWalletState.user.city} Postal: ${userWalletState.user.postal}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextBlackColor
+                        )
+                    }
                 }
 
                 // Wallet Info
-                Column(
+                Card(
                     modifier = Modifier
                         .constrainAs(walletInfo) {
                             top.linkTo(userInfo.bottom, margin = 5.dp)
                             start.linkTo(parent.start)
-                            end.linkTo(parent.end)
                         }
-                        .background(BackgroundColor)
-                        .padding(10.dp)
+                        .padding(horizontal = 10.dp, vertical = 1.dp),
+                    colors = CardDefaults.cardColors(containerColor = BackgroundColor)
                 ) {
-                    Text(
-                        text = "Total Worth: ${userWalletState.walletInfo.totalWorth}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextBlackColor
-                    )
-
-                    if( userWalletState.walletInfo.lastPurchase.countTimeStamp.isNotEmpty() ) {
-                        val formattedDate = formatDateTime(userWalletState.walletInfo.lastPurchase.countTimeStamp)
+                    Column(
+                        modifier = Modifier
+                            .padding(10.dp)
+                    ){
                         Text(
-                            text = "Last Purchase: $formattedDate",
+                            text = "Total Worth: ${userWalletState.walletInfo.totalWorth}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextBlackColor
                         )
+
+                        if (userWalletState.walletInfo.lastPurchase.countTimeStamp.isNotEmpty()) {
+                            val formattedDate =
+                                formatDateTime(userWalletState.walletInfo.lastPurchase.countTimeStamp)
+                            Text(
+                                text = "Last Purchase: $formattedDate",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = TextBlackColor
+                            )
+                        }
                     }
                 }
 
@@ -156,7 +160,7 @@ fun UserWalletInfoScreen(
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }
-                        .height(4.dp)
+                        .height(2.dp)
                 )
 
                 // Wallet List
@@ -182,110 +186,8 @@ fun UserWalletInfoScreen(
                     }
                 }
             }
-            /*ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-
-                val (welcomeText, userInfo, walletInfo, spacer, userList) = createRefs()
-                val backgroundColor = colorResource(R.color.teal_700)
-
-                // Welcome Text
-                Card(
-                    modifier = Modifier
-                        .constrainAs(welcomeText) {
-                            top.linkTo(parent.top, margin = 20.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        },
-                    colors = CardDefaults.cardColors(containerColor = backgroundColor )
-                ) {
-                    Text(
-                        text = "User and wallet info",
-                        modifier = Modifier
-                            .padding(10.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
-                    )
-                }
-
-                // User Info
-                if (userWalletState.user.postal.isNotEmpty()) {
-                    Text(
-                        text = userWalletState.user.postal,
-                        modifier = Modifier
-                            .constrainAs(userInfo) {
-                                top.linkTo(welcomeText.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            }
-                            .padding(10.dp)
-                            .background(BackgroundColor),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextBlackColor
-                    )
-                }
-
-                // Wallet Info
-                if (userWalletState.walletInfo.lastPurchase.countTimeStamp.isNotEmpty()) {
-
-                    val formattedDate = formatDateTime(userWalletState.walletInfo.lastPurchase.countTimeStamp)
-
-                    Text(
-                        text = formattedDate,
-                        modifier = Modifier
-                            .constrainAs(walletInfo) {
-                                top.linkTo(userInfo.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            }
-                            .background(BackgroundColor),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextBlackColor
-                    )
-                }
-
-                // Spacer
-                Spacer(
-                    modifier = Modifier
-                        .constrainAs(spacer) {
-                            top.linkTo(walletInfo.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .height(8.dp)
-                )
-
-                if (userWalletState.walletList.isNotEmpty()) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .constrainAs(userList) {
-                                top.linkTo(spacer.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            }
-                            .wrapContentSize()
-                            .padding(8.dp)
-                    ) {
-
-                        items(
-                            items = userWalletState.walletList,
-                            key = { wallet -> wallet.id }
-                        ) { wallet ->
-                            WalletsListScreen(
-                                user = wallet
-                            )
-                        }
-                    }
-                }
-            }*/
         }
     }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun formatDateTime(dateTime: String): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-    val parsedDateTime = LocalDateTime.parse(dateTime, formatter)
-    val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    return parsedDateTime.format(outputFormatter)
 }
 
 @Composable
@@ -294,13 +196,17 @@ fun WalletsListScreen(
 ) {
     Log.d("USER_ID", "Recompose user id is 1: ${user.id.toLong()}")
 
-    Text(
-        text = "Full Name: ${user.coinToken} \nCity is: ${user.countTimeStamp}",
-        fontSize = 14.sp,
+    Card(
         modifier = Modifier
-            .padding(horizontal = 40.dp, vertical = 10.dp)
-            .background(BackgroundColor)
-            .padding(10.dp) ,
-        color = TextBlackColor
-    )
+            .padding(5.dp),
+        colors = CardDefaults.cardColors(containerColor = BackgroundColor)
+    ) {
+        Text(
+            text = "Coin token: ${user.coinToken} \nCount TimeStamp: ${user.countTimeStamp}",
+            fontSize = 14.sp,
+            modifier = Modifier
+                .padding(horizontal = 10.dp, vertical = 10.dp),
+            color = TextBlackColor
+        )
+    }
 }

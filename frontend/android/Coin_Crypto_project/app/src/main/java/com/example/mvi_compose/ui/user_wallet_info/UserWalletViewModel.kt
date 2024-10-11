@@ -30,8 +30,6 @@ class UserWalletViewModel @Inject constructor(
     private val walletRepo: WalletsRepoImpl,
 ) : BaseViewModel<UserWalletState, UserWalletEvents>() {
 
-    private val mutex = Mutex()
-
     override fun initialState(): UserWalletState {
         return UserWalletState()
     }
@@ -49,13 +47,25 @@ class UserWalletViewModel @Inject constructor(
                         is NetworkResult.Error -> {
                             Log.d("coin_crypto", "apiError is: ${result.apiError}")
                             Log.d("coin_crypto", "message is: ${result.message}")
-                            _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
+                            _state.update {
+                                it.copy(
+                                    loading = false,
+                                    error = result.message
+                                        ?: "There is error occured, please try again"
+                                )
+                            }
                         }
 
                         is NetworkResult.Exception -> {
                             Log.d("coin_crypto", "apiError is 1: ${result.e}")
                             Log.d("coin_crypto", "message is 2: ${result.e.localizedMessage}")
-                            _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
+                            _state.update {
+                                it.copy(
+                                    loading = false,
+                                    error = result.e.localizedMessage
+                                        ?: "There is error occured, please try again"
+                                )
+                            }
                         }
 
                         is NetworkResult.Success -> {
@@ -65,19 +75,14 @@ class UserWalletViewModel @Inject constructor(
                                         user = result.data
                                     )
                                 }
-                                mutex.withLock {
-                                    viewModelScope.launch {
-                                        onEvent(UserWalletEvents.FetchWalletDetailsByUserId(event.userId))
-                                    }
-                                    viewModelScope.launch {
-                                        onEvent(UserWalletEvents.FetchWalletDetails(event.userId))
-                                    }
-                                }
+                                onEvent(UserWalletEvents.FetchWalletDetailsByUserId(event.userId))
+                                onEvent(UserWalletEvents.FetchWalletDetails(event.userId))
                             }
                         }
                     }
                 }
             }
+
             is UserWalletEvents.FetchWalletDetailsByUserId -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     when (val result = walletRepo.getWalletInfoByUserId(event.userId.toInt())) {
@@ -85,13 +90,25 @@ class UserWalletViewModel @Inject constructor(
                         is NetworkResult.Error -> {
                             Log.d("coin_crypto", "apiError is: ${result.apiError}")
                             Log.d("coin_crypto", "message is: ${result.message}")
-                            _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
+                            _state.update {
+                                it.copy(
+                                    loading = false,
+                                    error = result.message
+                                        ?: "There is error occured, please try again"
+                                )
+                            }
                         }
 
                         is NetworkResult.Exception -> {
                             Log.d("coin_crypto", "apiError is 1: ${result.e}")
                             Log.d("coin_crypto", "message is 2: ${result.e.localizedMessage}")
-                            _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
+                            _state.update {
+                                it.copy(
+                                    loading = false,
+                                    error = result.e.localizedMessage
+                                        ?: "There is error occured, please try again"
+                                )
+                            }
                         }
 
                         is NetworkResult.Success -> {
@@ -116,13 +133,25 @@ class UserWalletViewModel @Inject constructor(
                         is NetworkResult.Error -> {
                             Log.d("coin_crypto", "apiError is: ${result.apiError}")
                             Log.d("coin_crypto", "message is: ${result.message}")
-                            _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
+                            _state.update {
+                                it.copy(
+                                    loading = false,
+                                    error = result.message
+                                        ?: "There is error occured, please try again"
+                                )
+                            }
                         }
 
                         is NetworkResult.Exception -> {
                             Log.d("coin_crypto", "apiError is 1: ${result.e}")
                             Log.d("coin_crypto", "message is 2: ${result.e.localizedMessage}")
-                            _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
+                            _state.update {
+                                it.copy(
+                                    loading = false,
+                                    error = result.e.localizedMessage
+                                        ?: "There is error occured, please try again"
+                                )
+                            }
                         }
 
                         is NetworkResult.Success -> {
@@ -145,15 +174,19 @@ class UserWalletViewModel @Inject constructor(
 }
 
 sealed class UserWalletEvents {
-    class FetchUserById(val userId: Long): UserWalletEvents()
-    class FetchWalletDetails(val userId: Long): UserWalletEvents()
-    class FetchWalletDetailsByUserId(val userId: Long): UserWalletEvents()
+    class FetchUserById(val userId: Long) : UserWalletEvents()
+    class FetchWalletDetails(val userId: Long) : UserWalletEvents()
+    class FetchWalletDetailsByUserId(val userId: Long) : UserWalletEvents()
 }
 
 data class UserWalletState(
 
     val user: UserResponse = UserResponse(0, "", "", "", "", 0),
-    val walletInfo: WalletDetailsResponse = WalletDetailsResponse(listOf(), 0, WalletResponse(0,0, "", "")),
+    val walletInfo: WalletDetailsResponse = WalletDetailsResponse(
+        listOf(),
+        0,
+        WalletResponse(0, 0, "", "")
+    ),
 
     val walletList: MutableList<WalletResponse> = mutableListOf(),
 
