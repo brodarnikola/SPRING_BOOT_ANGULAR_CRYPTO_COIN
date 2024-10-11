@@ -50,7 +50,7 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
         (page: Page<ExchangeRate>) => {
           this.exchangeRates = page.content; 
           this.filteredExchangeRates = page.content;
-          this.totalPages = page.totalPages;
+          this.totalPages = page.totalPages - 1;
           this.pageInput = this.currentPage;
           this.calculateMedians();
         },
