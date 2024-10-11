@@ -25,6 +25,13 @@ import com.example.mvi_compose.network.data.ExchangeRatesResponse
 import com.example.mvi_compose.ui.UiEffect
 import com.example.mvi_compose.ui.coin_cryptos.ExchangeRateViewModel
 import com.example.mvi_compose.ui.dialogs.FilterDialog
+import com.example.mvi_compose.ui.users.ErrorScreen
+import com.example.mvi_compose.ui.users.LoadingScreen
+import com.example.mvi_compose.util.BackgroundColor
+import com.example.mvi_compose.util.TextBlackColor
+import com.example.mvi_compose.util.TextBlueColor
+import com.example.mvi_compose.util.TextGreenColor
+import com.example.mvi_compose.util.TextRedColor
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -70,28 +77,36 @@ fun ExchangeRatesScreen(viewModel: ExchangeRateViewModel) {
                     }
                     .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround) {
-                    Text(
-                        text = "Exchange Rate Analytics",
-                        modifier = Modifier
-                            .background(backgroundColor)
-                            .padding(10.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
-                    )
+
+                    Card(
+                        colors = CardDefaults.cardColors(backgroundColor )
+                    ) {
+                        Text(
+                            text = "Exchange Rate Analytics",
+                            modifier = Modifier
+                                .padding(10.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White
+                        )
+                    }
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    Text(
-                        text = "Filter",
-                        modifier = Modifier
-                            .background(backgroundColor)
-                            .clickable {
-                                showDialog = true
-                            }
-                            .padding(10.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
-                    )
+                    Card(
+                        colors = CardDefaults.cardColors(backgroundColor )
+                    ) {
+                        Text(
+                            text = "Filter",
+                            modifier = Modifier
+                                .background(backgroundColor)
+                                .clickable {
+                                    showDialog = true
+                                }
+                                .padding(10.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White
+                        )
+                    }
                 }
 
                 val listState = rememberLazyListState()
@@ -116,8 +131,7 @@ fun ExchangeRatesScreen(viewModel: ExchangeRateViewModel) {
                             rate = rate,
                             eurMedian = exchangeRateState.eurMedian,
                             usdMedian = exchangeRateState.usdMedian,
-                            gbpMedian = exchangeRateState.gbpMedian,
-                            backgroundColor = backgroundColor
+                            gbpMedian = exchangeRateState.gbpMedian
                         )
                     }
                 }
@@ -144,14 +158,13 @@ fun ExchangeRateItem(
     rate: ExchangeRatesResponse,
     eurMedian: Float,
     usdMedian: Float,
-    gbpMedian: Float,
-    backgroundColor: Color
+    gbpMedian: Float
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFe9e5e5) )
+        colors = CardDefaults.cardColors(containerColor = BackgroundColor )
     ) {
         Column(
             modifier = Modifier
@@ -160,7 +173,7 @@ fun ExchangeRateItem(
             Text(
                 text = "Date: ${rate.excRateDate}",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color(0xFF000000)
+                color = TextBlackColor
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -186,23 +199,8 @@ fun ExchangeRateItem(
 @Composable
 fun getColor(rate: Float, median: Float): Color {
     return when {
-        rate < median -> Color(0xFFFF0000)
-        rate > median -> Color(0xFF008000)
-        else -> Color(0xFF0000FF)
-    }
-}
-
-
-@Composable
-fun LoadingScreen() {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-    }
-}
-
-@Composable
-fun ErrorScreen(error: String) {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        Text(text = error, color = MaterialTheme.colorScheme.error)
+        rate < median -> TextRedColor
+        rate > median -> TextGreenColor
+        else -> TextBlueColor
     }
 }

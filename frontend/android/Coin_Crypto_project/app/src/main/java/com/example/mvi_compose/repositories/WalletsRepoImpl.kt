@@ -52,35 +52,6 @@ class WalletsRepoImpl @Inject constructor(
         return@withContext networkResult
     }
 
-//    override suspend fun getUsers(): NetworkResult<List<UserResponse>> = withContext(ioDispatcher) {
-//
-//        val networkResult = handleNetworkRequest {
-//            Log.d(REST_API_CALL,"start popular coin crypto")
-//            usersApi.getUsers( )
-//        }
-//
-//        if( networkResult is NetworkResult.Success ) {
-//            Log.d(REST_API_CALL,"get users success")
-//        }
-//
-//        return@withContext networkResult
-//    }
-//
-//    override suspend fun getUserById(userId: Long): NetworkResult<UserResponse> = withContext(ioDispatcher) {
-//
-//        val networkResult = handleNetworkRequest {
-//            Log.d(REST_API_CALL,"start popular coin crypto")
-//            usersApi.getUserById(userId)
-//        }
-//
-//        if( networkResult is NetworkResult.Success ) {
-//            Log.d(REST_API_CALL,"get users success")
-//        }
-//
-//        return@withContext networkResult
-//    }
-
-
     private suspend fun <T : Any> handleNetworkRequest(apiCall: suspend () -> Response<T>): NetworkResult<T> {
         return try {
             val response: Response<T> = apiCall.invoke()

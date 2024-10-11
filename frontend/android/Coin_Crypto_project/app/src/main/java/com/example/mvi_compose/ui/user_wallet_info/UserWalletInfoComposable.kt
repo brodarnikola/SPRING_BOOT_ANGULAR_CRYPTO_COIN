@@ -24,6 +24,10 @@ import com.example.mvi_compose.network.data.WalletResponse
 import com.example.mvi_compose.ui.UiEffect
 import com.example.mvi_compose.ui.coin_cryptos.UserWalletEvents
 import com.example.mvi_compose.ui.coin_cryptos.UserWalletViewModel
+import com.example.mvi_compose.ui.users.ErrorScreen
+import com.example.mvi_compose.ui.users.LoadingScreen
+import com.example.mvi_compose.util.BackgroundColor
+import com.example.mvi_compose.util.TextBlackColor
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -65,20 +69,142 @@ fun UserWalletInfoScreen(
                 val backgroundColor = colorResource(R.color.teal_700)
 
                 // Welcome Text
-                Text(
-                    text = "User and wallet info",
+                Card(
                     modifier = Modifier
                         .constrainAs(welcomeText) {
-                            top.linkTo(parent.top)
+                            top.linkTo(parent.top, margin = 20.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        },
+                    colors = CardDefaults.cardColors(containerColor = backgroundColor)
+                ) {
+                    Text(
+                        text = "User and wallet info",
+                        modifier = Modifier
+                            .padding(10.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
+                }
+
+                // User Info
+                Column(
+                    modifier = Modifier
+                        .constrainAs(userInfo) {
+                            top.linkTo(welcomeText.bottom, margin = 5.dp)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }
                         .padding(10.dp)
-                        .background(backgroundColor)
-                        .padding(10.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White
+                        .background(BackgroundColor)
+                        .padding(10.dp)
+                ) {
+                    Text(
+                        text = "Full Name: ${userWalletState.user.fullName}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextBlackColor
+                    )
+                    Text(
+                        text = "Address: ${userWalletState.user.address}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextBlackColor
+                    )
+                    Text(
+                        text = "City: ${userWalletState.user.city} Postal: ${userWalletState.user.postal}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextBlackColor
+                    )
+//                    Text(
+//                        text = "Postal: ${userWalletState.user.postal}",
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        color = TextBlackColor
+//                    )
+                }
+
+                // Wallet Info
+                Column(
+                    modifier = Modifier
+                        .constrainAs(walletInfo) {
+                            top.linkTo(userInfo.bottom, margin = 5.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .background(BackgroundColor)
+                        .padding(10.dp)
+                ) {
+                    Text(
+                        text = "Total Worth: ${userWalletState.walletInfo.totalWorth}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextBlackColor
+                    )
+
+                    if( userWalletState.walletInfo.lastPurchase.countTimeStamp.isNotEmpty() ) {
+                        val formattedDate = formatDateTime(userWalletState.walletInfo.lastPurchase.countTimeStamp)
+                        Text(
+                            text = "Last Purchase: $formattedDate",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextBlackColor
+                        )
+                    }
+                }
+
+                // Spacer
+                Spacer(
+                    modifier = Modifier
+                        .constrainAs(spacer) {
+                            top.linkTo(walletInfo.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .height(4.dp)
                 )
+
+                // Wallet List
+                if (userWalletState.walletList.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .constrainAs(userList) {
+                                top.linkTo(spacer.bottom)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            }
+                            .wrapContentSize()
+                            .padding(8.dp)
+                    ) {
+                        items(
+                            items = userWalletState.walletList,
+                            key = { wallet -> wallet.id }
+                        ) { wallet ->
+                            WalletsListScreen(
+                                user = wallet
+                            )
+                        }
+                    }
+                }
+            }
+            /*ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+
+                val (welcomeText, userInfo, walletInfo, spacer, userList) = createRefs()
+                val backgroundColor = colorResource(R.color.teal_700)
+
+                // Welcome Text
+                Card(
+                    modifier = Modifier
+                        .constrainAs(welcomeText) {
+                            top.linkTo(parent.top, margin = 20.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        },
+                    colors = CardDefaults.cardColors(containerColor = backgroundColor )
+                ) {
+                    Text(
+                        text = "User and wallet info",
+                        modifier = Modifier
+                            .padding(10.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
+                }
 
                 // User Info
                 if (userWalletState.user.postal.isNotEmpty()) {
@@ -91,9 +217,9 @@ fun UserWalletInfoScreen(
                                 end.linkTo(parent.end)
                             }
                             .padding(10.dp)
-                            .background(backgroundColor),
+                            .background(BackgroundColor),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
+                        color = TextBlackColor
                     )
                 }
 
@@ -110,9 +236,9 @@ fun UserWalletInfoScreen(
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)
                             }
-                            .background(backgroundColor),
+                            .background(BackgroundColor),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
+                        color = TextBlackColor
                     )
                 }
 
@@ -124,10 +250,9 @@ fun UserWalletInfoScreen(
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }
-                        .height(16.dp) // Adjust the height as needed
+                        .height(8.dp)
                 )
 
-                // LazyColumn for walletList
                 if (userWalletState.walletList.isNotEmpty()) {
                     LazyColumn(
                         modifier = Modifier
@@ -135,7 +260,6 @@ fun UserWalletInfoScreen(
                                 top.linkTo(spacer.bottom)
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)
-//                                bottom.linkTo(parent.bottom)
                             }
                             .wrapContentSize()
                             .padding(8.dp)
@@ -145,14 +269,13 @@ fun UserWalletInfoScreen(
                             items = userWalletState.walletList,
                             key = { wallet -> wallet.id }
                         ) { wallet ->
-                            MoviesListScreen(
-                                user = wallet,
-                                backgroundColor = backgroundColor
+                            WalletsListScreen(
+                                user = wallet
                             )
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 }
@@ -166,9 +289,8 @@ fun formatDateTime(dateTime: String): String {
 }
 
 @Composable
-fun MoviesListScreen(
-    user: WalletResponse,
-    backgroundColor: Color,
+fun WalletsListScreen(
+    user: WalletResponse
 ) {
     Log.d("USER_ID", "Recompose user id is 1: ${user.id.toLong()}")
 
@@ -177,22 +299,8 @@ fun MoviesListScreen(
         fontSize = 14.sp,
         modifier = Modifier
             .padding(horizontal = 40.dp, vertical = 10.dp)
-            .background(backgroundColor)
+            .background(BackgroundColor)
             .padding(10.dp) ,
-        color = Color.White
+        color = TextBlackColor
     )
-}
-
-@Composable
-fun LoadingScreen() {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-    }
-}
-
-@Composable
-fun ErrorScreen(error: String) {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        Text(text = error, color = MaterialTheme.colorScheme.error)
-    }
 }

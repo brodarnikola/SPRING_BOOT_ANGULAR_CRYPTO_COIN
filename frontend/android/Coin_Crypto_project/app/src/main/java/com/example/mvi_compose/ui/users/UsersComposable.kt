@@ -22,8 +22,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mvi_compose.R
 import com.example.mvi_compose.network.data.UserResponse
 import com.example.mvi_compose.ui.UiEffect
-import com.example.mvi_compose.ui.coin_cryptos.ExchangeRateViewModel
 import com.example.mvi_compose.ui.coin_cryptos.UsersViewModel
+import com.example.mvi_compose.util.BackgroundColor
+import com.example.mvi_compose.util.TextBlackColor
 
 @Composable
 fun UsersScreen(
@@ -52,36 +53,55 @@ fun UsersScreen(
             ErrorScreen(error = usersRateState.error)
         } else if (usersRateState.users.isNotEmpty()) {
             ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (welcomeText, userList, checkExchangeRates) = createRefs()
+                val (welcomeText, usersTitle, userList, checkExchangeRates) = createRefs()
                 val backgroundColor = colorResource(R.color.teal_700)
 
-                Text(
-                    text = "Welcome to coin crypto project",
+                Card(
                     modifier = Modifier
                         .constrainAs(welcomeText) {
-                            top.linkTo(parent.top)
+                            top.linkTo(parent.top, margin = 40.dp)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
-                            bottom.linkTo(userList.top)
-                        }
-                        .padding(10.dp)
-                        .background(backgroundColor)
-                        .padding(10.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White
-                )
+                        },
+                    colors = CardDefaults.cardColors(containerColor = BackgroundColor )
+                ) {
+                    Text(
+                        text = "Welcome to coin crypto project",
+                        modifier = Modifier
+                            .background(backgroundColor)
+                            .padding(10.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
+                }
 
                 val finalUsersList = remember { usersRateState.users }
                 val listState = rememberLazyListState()
+
+                Card(
+                    modifier = Modifier
+                        .constrainAs(usersTitle) {
+                            top.linkTo(welcomeText.bottom, margin = 80.dp)
+                            start.linkTo(parent.start, margin = 30.dp)
+                        },
+                    colors = CardDefaults.cardColors(containerColor = BackgroundColor )
+                ) {
+                    Text(
+                        text = "Users",
+                        modifier = Modifier
+                            .padding(10.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextBlackColor
+                    )
+                }
 
                 LazyColumn(
                     state = listState,
                     modifier = Modifier
                         .constrainAs(userList) {
-                            top.linkTo(welcomeText.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            bottom.linkTo(checkExchangeRates.top)
+                            top.linkTo(usersTitle.bottom)
+                            start.linkTo(parent.start, margin = 20.dp)
+//                            end.linkTo(parent.end)
                         }
                         .padding(8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -90,16 +110,14 @@ fun UsersScreen(
                         items = finalUsersList,
                         key = { user -> user.id }
                     ) { user ->
-                        MoviesListScreen(
+                        UsersListScreen(
                             onUserClick = onUserClick,
-                            user = user,
-                            backgroundColor = backgroundColor
+                            user = user
                         )
                     }
                 }
 
-                Text(
-                    text = "Check exchange rates",
+                Card(
                     modifier = Modifier
                         .constrainAs(checkExchangeRates) {
                             top.linkTo(userList.bottom)
@@ -107,41 +125,48 @@ fun UsersScreen(
                             end.linkTo(parent.end)
                             bottom.linkTo(parent.bottom)
                         }
-                        .padding(10.dp)
-                        .background(backgroundColor)
-                        .clickable(onClick = {
-                            Log.d("USER_ID", "onExchangeRateClick:  ")
-                            onExchangeRateClick()
-                        }),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White
-                )
+                        .padding(8.dp),
+                    colors = CardDefaults.cardColors(containerColor = BackgroundColor )
+                ) {
+                    Text(
+                        text = "Check exchange rates",
+                        modifier = Modifier
+                            .clickable(onClick = {
+                                Log.d("USER_ID", "onExchangeRateClick:  ")
+                                onExchangeRateClick()
+                            })
+                            .padding(10.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextBlackColor
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun MoviesListScreen(
+fun UsersListScreen(
     onUserClick: (id: Long) -> Unit,
-    user: UserResponse,
-    backgroundColor: Color,
+    user: UserResponse
 ) {
     Log.d("USER_ID", "Recompose user id is 1: ${user.id.toLong()}")
 
-    Text(
-        text = "Full Name: ${user.fullName} \nCity is: ${user.city}",
-        fontSize = 14.sp,
-        modifier = Modifier
-            .padding(horizontal = 40.dp, vertical = 10.dp)
-            .background(backgroundColor)
-            .padding(10.dp)
-            .clickable(onClick = {
-                Log.d("USER_ID", "User id is 11: ${user.id}")
-                onUserClick(user.id.toLong())
-            }),
-        color = Color.White
-    )
+    Card(
+        colors = CardDefaults.cardColors(containerColor = BackgroundColor )
+    ) {
+        Text(
+            text = "Full Name: ${user.fullName} \nCity is: ${user.city}",
+            fontSize = 14.sp,
+            modifier = Modifier
+                .padding(horizontal = 10.dp, vertical = 5.dp)
+                .clickable(onClick = {
+                    Log.d("USER_ID", "User id is 11: ${user.id}")
+                    onUserClick(user.id.toLong())
+                }),
+            color = TextBlackColor
+        )
+    }
 }
 
 @Composable
