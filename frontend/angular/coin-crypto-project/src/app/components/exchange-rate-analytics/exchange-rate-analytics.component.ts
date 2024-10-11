@@ -67,15 +67,23 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
   }
 
   onDateChange(): void {
-    this.fetchExchangeRates();
+    this.filterExchangeRates();
   }
 
   filterExchangeRates(): void {
-    this.filteredExchangeRates = this.exchangeRates.filter(rate => 
-      (!this.eurFilter || rate.excRateEur.toString().startsWith(this.eurFilter)) &&
-      (!this.usdFilter || rate.excRateUsd.toString().startsWith(this.usdFilter)) &&
-      (!this.gbpFilter || rate.excRateGbp.toString().startsWith(this.gbpFilter))
-    );
+
+    const fromDate = new Date(this.dateFrom);
+    const toDate = new Date(this.dateTo);
+
+    this.filteredExchangeRates = this.exchangeRates.filter(rate =>  {
+      const rateDate = new Date(rate.excRateDate);
+      return (
+        (!this.eurFilter || rate.excRateEur.toString().startsWith(this.eurFilter)) &&
+        (!this.usdFilter || rate.excRateUsd.toString().startsWith(this.usdFilter)) &&
+        (!this.gbpFilter || rate.excRateGbp.toString().startsWith(this.gbpFilter)) &&
+        (rateDate >= fromDate && rateDate <= toDate)
+      );
+    });
   }
 
 }
