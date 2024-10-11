@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class TestCoinService {
+public class InitialCoinService {
 
     private final Faker faker = new Faker();
 

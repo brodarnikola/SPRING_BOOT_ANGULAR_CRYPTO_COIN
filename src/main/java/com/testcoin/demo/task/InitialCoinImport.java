@@ -6,7 +6,7 @@ import com.testcoin.demo.model.TWallet;
 import com.testcoin.demo.repository.TExchangeRateRepository;
 import com.testcoin.demo.repository.TUserRepository;
 import com.testcoin.demo.repository.TWalletRepository;
-import com.testcoin.demo.service.TestCoinService;
+import com.testcoin.demo.service.InitialCoinService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class InitialCoinImport implements Runnable {
 
 
     @Autowired
-    private TestCoinService testCoinService;
+    private InitialCoinService initialCoinService;
 
     @Autowired
     private TUserRepository tUserRepository;
@@ -88,14 +88,14 @@ public class InitialCoinImport implements Runnable {
 
     private void generateUsers() {
         for (int i = 0; i < 3; i++) { // Generate 100 users
-            TUser user = testCoinService.getUser(i + 1);
+            TUser user = initialCoinService.getUser(i + 1);
             tUserRepository.save(user);
         }
     }
 
     private void generateWallets() {
         for (int i = 0; i < 3; i++) { // Generate 500 wallets
-            Set<TWallet> wallets = testCoinService.getWallet(i + 1);
+            Set<TWallet> wallets = initialCoinService.getWallet(i + 1);
             tWalletRepository.saveAll(wallets);
         }
     }
@@ -103,7 +103,7 @@ public class InitialCoinImport implements Runnable {
     private void generateExchangeRates() {
         LocalDate fromDate = LocalDate.now().minusYears(2); // Last 2 years
         LocalDate toDate = LocalDate.now();
-        Set<TExchangeRate> rates = testCoinService.getExchangeRates(fromDate, toDate);
+        Set<TExchangeRate> rates = initialCoinService.getExchangeRates(fromDate, toDate);
         tExchangeRateRepository.saveAll(rates);
     }
 
