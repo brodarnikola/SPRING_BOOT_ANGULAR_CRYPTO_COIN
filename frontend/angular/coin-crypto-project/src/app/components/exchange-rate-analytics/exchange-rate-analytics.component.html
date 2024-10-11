@@ -21,6 +21,13 @@
         <input type="number" id="gbpFilter" [(ngModel)]="gbpFilter" (input)="filterExchangeRates()" class="filter-input" step="any">
       </div>
     </div>
+     
+    <div class="pagination-controls">
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
+      <span>  Page {{ currentPage + 1 }} of {{ totalPages }}  </span>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages - 1">Next</button>
+    </div>
+    <br/>
 
     <table>
       <thead>

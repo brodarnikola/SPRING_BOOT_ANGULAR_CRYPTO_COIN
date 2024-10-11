@@ -4,6 +4,7 @@ import { ExchangeRate } from '../../model/exchangeRate';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { ColorUtils } from '../../util/color-utils';
+import { Page } from '../../model/page';
 
 @Component({
   selector: 'app-exchange-rate-analytics',
@@ -26,6 +27,10 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
   usdFilter: string = '';
   gbpFilter: string = '';
  
+  currentPage: number = 0;
+  totalPages: number = 0;
+  pageSize: number = 30;
+ 
   constructor( private exchangeRateService: ExchangeRateService) { }
 
   ngOnInit(): void {
@@ -33,7 +38,30 @@ export class ExchangeRateAnalyticsComponent implements OnInit {
     const twoYearsAgo = new Date(today.getFullYear() - 2, today.getMonth(), today.getDate());
     this.dateFrom = twoYearsAgo.toISOString().split('T')[0];
     this.dateTo = today.toISOString().split('T')[0];
-    this.fetchExchangeRates();
+    // this.fetchExchangeRates();
+
+    this.fetchPaginatedExchangeRates();
+  }
+
+  fetchPaginatedExchangeRates(): void {
+    this.exchangeRateService.getPaginatedExchangeRates(this.dateFrom, this.dateTo, this.currentPage, this.pageSize)
+      .subscribe(
+        (page: Page<ExchangeRate>) => {
+          this.exchangeRates = page.content;
+          
+        this.filteredExchangeRates = page.content;
+          this.totalPages = page.totalPages;
+          this.calculateMedians();
+        },
+        (error) => console.error('Error fetching paginated exchange rates', error)
+      );
+  }
+
+  goToPage(pageNumber: number): void {
+    if (pageNumber >= 0 && pageNumber < this.totalPages) {
+      this.currentPage = pageNumber;
+      this.fetchPaginatedExchangeRates();
+    }
   }
 
   fetchExchangeRates(): void {
