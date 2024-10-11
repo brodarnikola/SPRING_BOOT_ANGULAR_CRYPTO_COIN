@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.repositories.UserRepoImpl
 import com.example.mvi_compose.network.NetworkResult
 import com.example.mvi_compose.network.data.UserResponse
+import com.example.mvi_compose.network.data.WalletDetailsResponse
 import com.example.mvi_compose.network.data.WalletResponse
 import com.example.mvi_compose.repositories.WalletsRepoImpl
 import com.example.mvi_compose.ui.BaseViewModel
@@ -17,6 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -27,13 +30,12 @@ class UserWalletViewModel @Inject constructor(
     private val walletRepo: WalletsRepoImpl,
 ) : BaseViewModel<UserWalletState, UserWalletEvents>() {
 
+    private val mutex = Mutex()
+
     override fun initialState(): UserWalletState {
         return UserWalletState()
     }
 
-//    init {
-//        onEvent(UserWalletEvents.FetchUserById)
-//    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onEvent(event: UserWalletEvents) {
@@ -63,9 +65,14 @@ class UserWalletViewModel @Inject constructor(
                                         user = result.data
                                     )
                                 }
-                                onEvent(UserWalletEvents.FetchWalletDetailsByUserId(event.userId))
-                                onEvent(UserWalletEvents.FetchWalletDetails(event.userId))
-
+                                mutex.withLock {
+                                    viewModelScope.launch {
+                                        onEvent(UserWalletEvents.FetchWalletDetailsByUserId(event.userId))
+                                    }
+                                    viewModelScope.launch {
+                                        onEvent(UserWalletEvents.FetchWalletDetails(event.userId))
+                                    }
+                                }
                             }
                         }
                     }
@@ -146,7 +153,7 @@ sealed class UserWalletEvents {
 data class UserWalletState(
 
     val user: UserResponse = UserResponse(0, "", "", "", "", 0),
-    val walletInfo: WalletResponse = WalletResponse(0, 0, "", ""),
+    val walletInfo: WalletDetailsResponse = WalletDetailsResponse(listOf(), 0, WalletResponse(0,0, "", "")),
 
     val walletList: MutableList<WalletResponse> = mutableListOf(),
 

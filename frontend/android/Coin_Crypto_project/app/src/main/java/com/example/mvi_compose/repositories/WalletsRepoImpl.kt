@@ -7,6 +7,7 @@ import com.example.mvi_compose.network.UsersApi
 import com.example.mvi_compose.network.NetworkResult
 import com.example.mvi_compose.network.WalletsApi
 import com.example.mvi_compose.network.data.UserResponse
+import com.example.mvi_compose.network.data.WalletDetailsResponse
 import com.example.mvi_compose.network.data.WalletResponse
 import com.example.mvi_compose.util.AppConstants.Companion.REST_API_CALL
 import com.squareup.moshi.Moshi
@@ -38,7 +39,7 @@ class WalletsRepoImpl @Inject constructor(
         return@withContext networkResult
     }
 
-    override suspend fun getWalletInfoByUserId(userId: Int): NetworkResult<WalletResponse> = withContext(ioDispatcher) {
+    override suspend fun getWalletInfoByUserId(userId: Int): NetworkResult<WalletDetailsResponse> = withContext(ioDispatcher) {
         val networkResult = handleNetworkRequest {
             Log.d(REST_API_CALL,"start popular coin crypto")
             walletsApi.getWalletInfoByUserId(userId)

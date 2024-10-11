@@ -1,0 +1,15 @@
+meta {
+  name: Wallets details
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:9000/api/coin/wallets/details?idUser=1
+  body: none
+  auth: none
+}
+
+params:query {
+  idUser: 1
+}
